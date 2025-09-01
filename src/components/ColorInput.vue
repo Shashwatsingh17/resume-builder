@@ -28,14 +28,25 @@ export default {
     label {
         display: flex;
         align-items: center;
+        font-size: 14px;
+        color: var(--dark-text-secondary);
+        margin-bottom: 12px;
     }
+    
     .color-picker {
-        margin-right: 10px;
-        /* offset strange height, width difference */
-        width: 26px;
-        height: 30px;
+        margin-right: 12px;
+        width: 32px;
+        height: 32px;
         padding: 0;
-        border: none;
+        border: 2px solid var(--dark-border);
+        border-radius: 6px;
         background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .color-picker:hover {
+        border-color: var(--dark-accent);
+        transform: scale(1.05);
     }
 </style>

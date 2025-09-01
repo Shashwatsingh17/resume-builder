@@ -7,28 +7,40 @@
 
 <style>
     .sidebar {
-        width: 300px;
-        /* overflow-y: scroll; */
-        padding: 20px 20px 20px 30px;
+        width: 320px;
+        padding: 32px 24px;
         position: fixed;
         top: 0;
         left: 0;
         height: 100%;
-        background-color: rgb(230, 230, 230);
+        background: var(--dark-bg-secondary);
+        border-right: 1px solid var(--dark-border);
+        overflow-y: auto;
+        backdrop-filter: blur(10px);
     }
 
     .sidebar label {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        color: var(--dark-text-secondary);
+        font-weight: 500;
     }
 
     .sidebar .btn {
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .sidebar-section {
-        background-color: #fff;
-        border-radius: 4px;
-        padding: 15px 10px 5px 10px;
-        margin-top: 20px;
+        background: var(--dark-bg-tertiary);
+        border: 1px solid var(--dark-border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-section:hover {
+        border-color: var(--dark-accent);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
     }
 </style>

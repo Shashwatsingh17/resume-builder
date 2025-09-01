@@ -73,19 +73,32 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .contact li:last-child {
   margin-bottom: 0;
 }
 
+.contact li:hover {
+  background: rgba(99, 102, 241, 0.05);
+  padding-left: 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
 .contact svg {
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 12px;
+  opacity: 0.9;
 }
 
 .contact span {
-  width: 80%;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>

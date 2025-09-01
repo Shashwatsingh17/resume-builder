@@ -24,22 +24,26 @@
 
 <style scoped>
     .section-headline {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: var(--headline-weight);
-        margin-bottom: 15px;
+        margin-bottom: 16px;
         margin-top: 0;
+        letter-spacing: 0.5px;
     }
 
     .left-col .section-headline {
         border-bottom: 1px solid var(--highlight-color-left);
-        padding-bottom: 5px;
+        padding-bottom: 8px;
         margin-right: -30px;
-        padding-right: 10px;
+        padding-right: 30px;
         color: var(--highlight-color-left);
+        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: 600;
     }
 
     .right-col .section-headline {
         color: var(--highlight-color-right);
+        font-size: 20px;
     }
-
 </style>

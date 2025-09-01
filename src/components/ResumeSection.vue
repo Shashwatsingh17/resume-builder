@@ -6,6 +6,10 @@
 
 <style scoped>
 .resume-section {
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+}
+
+.resume-section:last-child {
+  margin-bottom: 0;
 }
 </style>

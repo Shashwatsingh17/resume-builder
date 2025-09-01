@@ -1,5 +1,5 @@
 <template>
-  <main class="container">
+  <main class="app-container">
     <Sidebar>
       <ToggleSwitch
         @switch-toggled="toggleEditMode"
@@ -8,7 +8,7 @@
         :toggle-active="editing" />
 
       <div class="sidebar-section" v-if="editing">
-        <p>Left column</p>
+        <h3 class="section-title">Left Column Colors</h3>
         <ColorInput
           label="Highlight color"
           @color-changed="colors.left.highlight = $event"
@@ -26,7 +26,7 @@
       </div>
 
       <div class="sidebar-section" v-if="editing">
-        <p>Right column</p>
+        <h3 class="section-title">Right Column Colors</h3>
         <ColorInput
           label="Highlight color"
           @color-changed="colors.right.highlight = $event"
@@ -44,6 +44,7 @@
       </div>
 
       <div class="sidebar-section" v-if="editing">
+        <h3 class="section-title">Layout Settings</h3>
         <SelectInput
           v-if="editing"
           label="Headline thickness"
@@ -65,6 +66,7 @@
       </div>
 
       <div class="sidebar-section" v-if="editing">
+        <h3 class="section-title">Profile Photo</h3>
         <ToggleSwitch
           @switch-toggled="toggleImageDisplay"
           label="Show photo"
@@ -86,6 +88,7 @@
       </div>
 
       <div class="sidebar-section" v-if="!editing">
+        <h3 class="section-title">Export Options</h3>
         <SelectInput
           label="Resume format"
           :options="[
@@ -99,10 +102,11 @@
       </div>
 
       <div class="sidebar-section" v-if="!editing">
-        <small style="display: block; margin-bottom: 10px">
+        <h3 class="section-title">Configuration</h3>
+        <p class="section-description">
           A file with your configuration will be downloaded to your computer.
           You can upload it whenever you want to restore your settings.
-        </small>
+        </p>
 
         <CustomButton @click="downloadConfig" btn-type="secondary">
           Download configuration
@@ -118,9 +122,12 @@
     </Sidebar>
 
     <div class="resume-wrapper">
-      <CustomButton @click="saveConfig" btn-type="primary-right">
-        Save configuration in browser
-      </CustomButton>
+      <div class="resume-header">
+        <h1 class="app-title">Resume Builder</h1>
+        <CustomButton @click="saveConfig" btn-type="primary-right">
+          Save Configuration
+        </CustomButton>
+      </div>
 
       <div
         id="resume"
@@ -334,13 +341,13 @@ export default {
       editing: true,
       colors: {
         left: {
-          highlight: "#82C0CC",
+          highlight: "#6366f1",
           text: "#ffffff",
-          background: "#3943B7",
+          background: "#1e293b",
         },
         right: {
-          highlight: "#3943B7",
-          text: "#000505",
+          highlight: "#6366f1",
+          text: "#1e293b",
           background: "#ffffff",
         },
       },
@@ -564,12 +571,55 @@ export default {
 </script>
 
 <style>
+.app-container {
+  margin: 0;
+  max-width: none;
+  min-height: 100vh;
+  background: var(--dark-bg-primary);
+  display: flex;
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--dark-text-primary);
+  margin: 0;
+}
+
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-text-primary);
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section-description {
+  font-size: 13px;
+  color: var(--dark-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
 #resume {
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-    rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
   /* DIN A4 standard paper size. commonly used for resumes
     For North America letter size use width: 8.5in; height: 11in; */
   width: 210mm;
+  transition: all 0.3s ease;
 }
 
 #resume.edit-off {
@@ -580,7 +630,11 @@ export default {
 
 .resume-wrapper {
   width: 210mm;
-  margin-left: auto;
+  margin: 40px auto;
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* if letter format selected */
@@ -589,9 +643,9 @@ export default {
   height: 11in;
 }
 
-@media (min-width: 1350px) {
+@media (min-width: 1400px) {
   .resume-wrapper {
-    margin-left: 300px;
+    margin-left: 320px;
   }
 }
 
@@ -602,6 +656,7 @@ export default {
 }
 
 .left-col {
+  border-radius: 12px 0 0 12px;
   background-color: var(--background-color-left);
   color: var(--text-color-left);
   border-right: 1px solid var(--highlight-color-left);
@@ -614,6 +669,7 @@ export default {
 }
 
 .right-col {
+  border-radius: 0 12px 12px 0;
   background-color: var(--background-color-right);
   color: var(--text-color-right);
   width: 70%;
@@ -625,6 +681,7 @@ export default {
 }
 
 .personal-name {
+  font-family: 'Inter', sans-serif;
   font-weight: 300;
   color: var(--highlight-color-right);
   font-size: 28px;
@@ -636,6 +693,7 @@ export default {
 }
 
 .personal-title {
+  font-family: 'Inter', sans-serif;
   border-bottom: 1px solid var(--highlight-color-right);
   margin: 0 0 20px -30px;
   padding: 15px 0 15px 30px;

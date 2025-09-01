@@ -68,36 +68,44 @@ export default {
 .entry-title-row {
   display: flex;
   align-items: center;
-  margin-bottom: 3px;
+  margin-bottom: 6px;
 }
 
 .resumeentry-title {
-  font-size: 16px;
-  /* text-transform: uppercase; */
+  font-size: 17px;
   font-weight: 600;
-  /* color: var(--highlight-color-right); */
+  color: var(--highlight-color-right);
 }
 
 .inner-section {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .inner-section__editing {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .resumeentry-date,
 .resumeentry-location {
-  font-size: 14px;
-  /* font-weight: 300; */
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .resumeentry-date {
   font-style: italic;
   color: var(--highlight-color-right);
+  font-weight: 600;
 }
 
 li {
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 8px;
 }
 </style>

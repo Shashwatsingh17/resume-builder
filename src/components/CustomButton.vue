@@ -27,50 +27,59 @@ export default {
 
 <style scoped>
     .btn {
-        border-radius: 4px;
-        padding: 8px 10px;
+        border-radius: 8px;
+        padding: 12px 20px;
         border: none;
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 500;
         display: block;
         width: 100%;
-        background-color: #82C0CC;
-    }
-    .btn:hover {
-        background-color: #73aab5;
-    }
-
-    .btn:hover {
+        background: var(--dark-accent);
+        color: var(--dark-text-primary);
+        transition: all 0.2s ease;
         cursor: pointer;
+        font-family: inherit;
     }
+    
+    .btn:hover {
+        background: var(--dark-accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
     .btn-primary {
-        background-color: var(--color-black);
-        color: #fff;
+        background: linear-gradient(135deg, var(--dark-accent) 0%, var(--dark-accent-hover) 100%);
+        color: var(--dark-text-primary);
     }
 
     .btn-primary:hover {
-        background-color: var(--color-black);
+        background: linear-gradient(135deg, var(--dark-accent-hover) 0%, #4f46e5 100%);
     }
 
     .btn-secondary {
-        background-color: #3943B7;
-        color: #fff;
+        background: var(--dark-bg-tertiary);
+        color: var(--dark-text-secondary);
+        border: 1px solid var(--dark-border);
     }
 
     .btn-secondary:hover {
-        background-color: #30399e;
+        background: var(--dark-border);
+        color: var(--dark-text-primary);
     }
 
     /* added in 4.1 (saving configuration) */
     .btn-primary-right {
-        background-color: var(--color-black);
-        color: #fff;
+        background: linear-gradient(135deg, var(--dark-success) 0%, #059669 100%);
+        color: var(--dark-text-primary);
         margin-left: auto;
-        margin-bottom: 20px;
         width: auto;
+        padding: 12px 24px;
+        font-weight: 600;
     }
 
     .btn-primary-right:hover {
-        background-color: var(--color-black);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
     }
-
 </style>

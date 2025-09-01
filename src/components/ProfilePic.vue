@@ -23,17 +23,23 @@ export default {
 <style scoped>
 .profile-pic {
   display: block;
-  width: 160px;
-  height: 160px;
-  border: 5px solid var(--highlight-color-left);
-  margin-bottom: 20px;
+  width: 140px;
+  height: 140px;
+  border: 3px solid var(--highlight-color-left);
+  margin-bottom: 24px;
   object-fit: cover;
   margin-left: auto;
   margin-right: auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.profile-pic:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
 }
 
 .circle {
-    border-radius: 50%;
+  border-radius: 50%;
 }
-
 </style>
