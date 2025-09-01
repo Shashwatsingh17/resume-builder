@@ -1,5 +1,5 @@
 <template>
-  <main class="app-container">
+  <main class="app-container" ref="appContainer">
     <Sidebar>
       <ToggleSwitch
         @switch-toggled="toggleEditMode"
@@ -7,7 +7,7 @@
         off-label="Export mode"
         :toggle-active="editing" />
 
-      <div class="sidebar-section" v-if="editing">
+      <div class="sidebar-section fade-in" v-if="editing" ref="leftColorSection">
         <h3 class="section-title">Left Column Colors</h3>
         <ColorInput
           label="Highlight color"
@@ -25,7 +25,7 @@
           :default-color="colors.left.text" />
       </div>
 
-      <div class="sidebar-section" v-if="editing">
+      <div class="sidebar-section fade-in" v-if="editing" ref="rightColorSection">
         <h3 class="section-title">Right Column Colors</h3>
         <ColorInput
           label="Highlight color"
@@ -43,7 +43,7 @@
           :default-color="colors.right.text" />
       </div>
 
-      <div class="sidebar-section" v-if="editing">
+      <div class="sidebar-section fade-in" v-if="editing" ref="layoutSection">
         <h3 class="section-title">Layout Settings</h3>
         <SelectInput
           v-if="editing"
@@ -65,7 +65,7 @@
           @percentage-changed="widthLeft = $event" />
       </div>
 
-      <div class="sidebar-section" v-if="editing">
+      <div class="sidebar-section fade-in" v-if="editing" ref="photoSection">
         <h3 class="section-title">Profile Photo</h3>
         <ToggleSwitch
           @switch-toggled="toggleImageDisplay"
@@ -87,7 +87,7 @@
           @update-selection="imageShape = $event" />
       </div>
 
-      <div class="sidebar-section" v-if="!editing">
+      <div class="sidebar-section fade-in" v-if="!editing" ref="exportSection">
         <h3 class="section-title">Export Options</h3>
         <SelectInput
           label="Resume format"
@@ -101,7 +101,7 @@
         <ExportPdf :resume-format="resumeFormat" />
       </div>
 
-      <div class="sidebar-section" v-if="!editing">
+      <div class="sidebar-section fade-in" v-if="!editing" ref="configSection">
         <h3 class="section-title">Configuration</h3>
         <p class="section-description">
           A file with your configuration will be downloaded to your computer.
@@ -121,33 +121,39 @@
       </div>
     </Sidebar>
 
-    <div class="resume-wrapper">
-      <div class="resume-header">
-        <h1 class="app-title">Resume Builder</h1>
+    <div class="resume-wrapper" ref="resumeWrapper">
+      <div class="resume-header" ref="resumeHeader">
+        <h1 class="app-title gradient-text">Resume Builder</h1>
         <CustomButton @click="saveConfig" btn-type="primary-right">
+          <svg class="save-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586l-1.293-1.293z"/>
+            <path d="M5 3a2 2 0 00-2 2v1a1 1 0 002 0V5a1 1 0 011-1h8a1 1 0 011 1v1a1 1 0 102 0V5a2 2 0 00-2-2H5zM5 15a2 2 0 01-2-2v-1a1 1 0 012 0v1a1 1 0 001 1h8a1 1 0 001-1v-1a1 1 0 112 0v1a2 2 0 01-2 2H5z"/>
+          </svg>
           Save Configuration
         </CustomButton>
       </div>
 
-      <AIAnalysis :resume-data="$data" v-if="!editing" />
+      <AIAnalysis :resume-data="$data" v-if="!editing" ref="aiAnalysis" />
 
       <ResumeVariations 
         :resume-data="$data" 
         @apply-variation="applyVariation"
-        v-if="!editing" />
+        v-if="!editing" 
+        ref="resumeVariations" />
 
       <div
         id="resume"
-        class="d-flex"
+        class="d-flex resume-container"
+        ref="resumeContainer"
         :class="{
           'edit-off': !editing,
           'letter-format': resumeFormat == 'letter',
         }"
         :style="cssVariables">
-        <div class="left-col" :style="{ width: percentageWidthLeft }">
-          <ProfilePic :url="imageUrl" :shape="imageShape" :show="showImage" />
+        <div class="left-col" :style="{ width: percentageWidthLeft }" ref="leftCol">
+          <ProfilePic :url="imageUrl" :shape="imageShape" :show="showImage" ref="profilePic" />
 
-          <ResumeSection>
+          <ResumeSection ref="aboutSection">
             <SectionHeadline
               :headline="headlines[0]"
               :editing="editing"
@@ -159,7 +165,7 @@
             </p>
           </ResumeSection>
 
-          <ResumeSection>
+          <ResumeSection ref="contactSection">
             <SectionHeadline
               :headline="headlines[1]"
               :editing="editing"
@@ -171,7 +177,7 @@
               @edit="updateNestedProperty" />
           </ResumeSection>
 
-          <ResumeSection>
+          <ResumeSection ref="skillsSection">
             <SectionHeadline
               :headline="headlines[2]"
               :editing="editing"
@@ -191,7 +197,7 @@
               :show-remove-btn="skills.length > 0" />
           </ResumeSection>
 
-          <ResumeSection>
+          <ResumeSection ref="certificationsSection">
             <SectionHeadline
               :headline="headlines[3]"
               :editing="editing"
@@ -212,21 +218,23 @@
           </ResumeSection>
         </div>
 
-        <div class="right-col">
+        <div class="right-col" ref="rightCol">
           <div
             class="personal-name"
+            ref="personalName"
             :contenteditable="editing"
             @blur="updateProperty($event, 'name')">
             {{ name }}
           </div>
           <div
             class="personal-title"
+            ref="personalTitle"
             :contenteditable="editing"
             @blur="updateProperty($event, 'title')">
             {{ title }}
           </div>
 
-          <ResumeSection>
+          <ResumeSection ref="experienceSection">
             <div class="d-flex">
               <SectionHeadline
                 :headline="headlines[4]"
@@ -260,7 +268,7 @@
             </div>
           </ResumeSection>
 
-          <ResumeSection>
+          <ResumeSection ref="educationSection">
             <div class="d-flex">
               <SectionHeadline
                 :headline="headlines[5]"
@@ -300,6 +308,8 @@
 </template>
 
 <script>
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ResumeSection from "./components/ResumeSection.vue";
 import SectionHeadline from "./components/SectionHeadline.vue";
 import EditButtons from "./components/EditButtons.vue";
@@ -317,7 +327,12 @@ import ExportPdf from "./components/ExportPdf.vue";
 import AIAnalysis from "./components/AIAnalysis.vue";
 import ResumeVariations from "./components/ResumeVariations.vue";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default {
+  mounted() {
+    this.initAnimations();
+  },
   created() {
     const savedResume = localStorage.getItem("resume");
     if (savedResume) {
@@ -328,6 +343,12 @@ export default {
         console.error("Error parsing resume data:", error);
       }
     }
+  },
+  updated() {
+    // Re-initialize animations when editing mode changes
+    this.$nextTick(() => {
+      this.initAnimations();
+    });
   },
   components: {
     ResumeSection,
@@ -588,6 +609,186 @@ export default {
       const message = "Resume variation has been applied successfully! Your resume has been updated with the new optimizations.";
       window.alert(message);
     },
+    initAnimations() {
+      // Clear previous animations
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      
+      // Animate app container on load
+      gsap.fromTo(this.$refs.appContainer, 
+        { opacity: 0 },
+        { opacity: 1, duration: 1, ease: "power2.out" }
+      );
+
+      // Animate resume header
+      if (this.$refs.resumeHeader) {
+        gsap.fromTo(this.$refs.resumeHeader,
+          { y: -30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: "power2.out" }
+        );
+      }
+
+      // Animate resume container
+      if (this.$refs.resumeContainer) {
+        gsap.fromTo(this.$refs.resumeContainer,
+          { scale: 0.95, opacity: 0, y: 20 },
+          { scale: 1, opacity: 1, y: 0, duration: 1, delay: 0.4, ease: "power2.out" }
+        );
+      }
+
+      // Animate sidebar sections
+      const sidebarSections = [
+        this.$refs.leftColorSection,
+        this.$refs.rightColorSection,
+        this.$refs.layoutSection,
+        this.$refs.photoSection,
+        this.$refs.exportSection,
+        this.$refs.configSection
+      ].filter(Boolean);
+
+      sidebarSections.forEach((section, index) => {
+        gsap.fromTo(section,
+          { x: -50, opacity: 0 },
+          { 
+            x: 0, 
+            opacity: 1, 
+            duration: 0.6, 
+            delay: 0.1 * index, 
+            ease: "power2.out" 
+          }
+        );
+      });
+
+      // Animate resume sections
+      const resumeSections = [
+        this.$refs.aboutSection?.$el,
+        this.$refs.contactSection?.$el,
+        this.$refs.skillsSection?.$el,
+        this.$refs.certificationsSection?.$el,
+        this.$refs.experienceSection?.$el,
+        this.$refs.educationSection?.$el
+      ].filter(Boolean);
+
+      resumeSections.forEach((section, index) => {
+        gsap.fromTo(section,
+          { y: 30, opacity: 0 },
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.6, 
+            delay: 0.6 + (0.1 * index), 
+            ease: "power2.out" 
+          }
+        );
+      });
+
+      // Animate personal info
+      if (this.$refs.personalName) {
+        gsap.fromTo(this.$refs.personalName,
+          { x: 30, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.8, delay: 0.8, ease: "power2.out" }
+        );
+      }
+
+      if (this.$refs.personalTitle) {
+        gsap.fromTo(this.$refs.personalTitle,
+          { x: 30, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.8, delay: 0.9, ease: "power2.out" }
+        );
+      }
+
+      // Animate profile picture
+      if (this.$refs.profilePic?.$el) {
+        gsap.fromTo(this.$refs.profilePic.$el,
+          { scale: 0, rotation: -180 },
+          { scale: 1, rotation: 0, duration: 1, delay: 1, ease: "back.out(1.7)" }
+        );
+      }
+
+      // Animate AI Analysis and Resume Variations
+      if (this.$refs.aiAnalysis?.$el) {
+        gsap.fromTo(this.$refs.aiAnalysis.$el,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, delay: 0.3, ease: "power2.out" }
+        );
+      }
+
+      if (this.$refs.resumeVariations?.$el) {
+        gsap.fromTo(this.$refs.resumeVariations.$el,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, delay: 0.4, ease: "power2.out" }
+        );
+      }
+
+      // Add hover animations for interactive elements
+      this.addHoverAnimations();
+    },
+    addHoverAnimations() {
+      // Add hover effects to buttons
+      const buttons = this.$el.querySelectorAll('.btn');
+      buttons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+          gsap.to(button, { scale: 1.05, duration: 0.2, ease: "power2.out" });
+        });
+        button.addEventListener('mouseleave', () => {
+          gsap.to(button, { scale: 1, duration: 0.2, ease: "power2.out" });
+        });
+      });
+
+      // Add hover effects to sidebar sections
+      const sections = this.$el.querySelectorAll('.sidebar-section');
+      sections.forEach(section => {
+        section.addEventListener('mouseenter', () => {
+          gsap.to(section, { 
+            y: -2, 
+            boxShadow: "0 8px 25px rgba(99, 102, 241, 0.15)", 
+            duration: 0.3, 
+            ease: "power2.out" 
+          });
+        });
+        section.addEventListener('mouseleave', () => {
+          gsap.to(section, { 
+            y: 0, 
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", 
+            duration: 0.3, 
+            ease: "power2.out" 
+          });
+        });
+      });
+    },
+    animateEditModeToggle() {
+      const timeline = gsap.timeline();
+      
+      // Animate resume container
+      timeline.to(this.$refs.resumeContainer, {
+        scale: 0.98,
+        duration: 0.2,
+        ease: "power2.inOut"
+      })
+      .to(this.$refs.resumeContainer, {
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.7)"
+      });
+
+      // Animate sidebar sections
+      const sidebarSections = this.$el.querySelectorAll('.sidebar-section');
+      gsap.fromTo(sidebarSections,
+        { x: -20, opacity: 0 },
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.4, 
+          stagger: 0.1, 
+          ease: "power2.out" 
+        }
+      );
+    },
+    toggleEditMode(isChecked) {
+      this.editing = isChecked;
+      this.$nextTick(() => {
+        this.animateEditModeToggle();
+      });
+    },
   },
 };
 </script>
@@ -597,69 +798,116 @@ export default {
   margin: 0;
   max-width: none;
   min-height: 100vh;
-  background: var(--dark-bg-primary);
+  background: transparent;
   display: flex;
+  position: relative;
 }
 
 .app-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--dark-text-primary);
+  font-size: 28px;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.save-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
 }
 
 .resume-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
   padding: 0 20px;
+  background: var(--gradient-secondary);
+  border-radius: 16px;
+  padding: 24px 32px;
+  border: 1px solid var(--dark-border);
+  backdrop-filter: var(--blur-backdrop);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .section-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--dark-text-primary);
   margin: 0 0 16px 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
 }
 
 .section-description {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--dark-text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0 0 16px 0;
+}
+
+.resume-container {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #resume {
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+    0 32px 64px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   overflow: hidden;
-  /* DIN A4 standard paper size. commonly used for resumes
-    For North America letter size use width: 8.5in; height: 11in; */
   width: 210mm;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+#resume::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+  border-radius: 16px;
+}
+
+#resume:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 40px 80px -12px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 #resume.edit-off {
-  /* DIN A4 standard paper size. commonly used for resumes
-    For North America letter size use width: 8.5in; height: 11in; */
   height: 297mm;
 }
 
 .resume-wrapper {
   width: 210mm;
-  margin: 40px auto;
+  margin: 48px auto;
   padding: 0 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-/* if letter format selected */
 #resume.edit-off.letter-format {
   width: 8.5in;
   height: 11in;
@@ -667,7 +915,7 @@ export default {
 
 @media (min-width: 1400px) {
   .resume-wrapper {
-    margin-left: 320px;
+    margin-left: 340px;
   }
 }
 
@@ -678,54 +926,113 @@ export default {
 }
 
 .left-col {
-  border-radius: 12px 0 0 12px;
+  border-radius: 16px 0 0 16px;
   background-color: var(--background-color-left);
   color: var(--text-color-left);
-  border-right: 1px solid var(--highlight-color-left);
-  /* width: 30%; remove in module 3 */
-  padding: 30px;
+  border-right: 2px solid var(--highlight-color-left);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.left-col::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .left-col li {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.left-col li:hover {
+  transform: translateX(4px);
 }
 
 .right-col {
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 16px 16px 0;
   background-color: var(--background-color-right);
   color: var(--text-color-right);
   width: 70%;
-  padding: 30px 30px 0 30px;
+  padding: 36px 36px 0 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.right-col::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(225deg, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .right-col li {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.right-col li:hover {
+  transform: translateX(2px);
 }
 
 .personal-name {
   font-family: 'Inter', sans-serif;
-  font-weight: 300;
+  font-weight: 700;
   color: var(--highlight-color-right);
-  font-size: 28px;
-  border-bottom: 1px solid var(--highlight-color-right);
+  font-size: 32px;
+  border-bottom: 3px solid var(--highlight-color-right);
   margin: 0;
-  margin-left: -30px;
-  padding-left: 30px;
-  padding-bottom: 15px;
+  margin-left: -36px;
+  padding-left: 36px;
+  padding-bottom: 18px;
+  letter-spacing: -0.5px;
+  position: relative;
+  background: linear-gradient(135deg, var(--highlight-color-right) 0%, rgba(99, 102, 241, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .personal-title {
   font-family: 'Inter', sans-serif;
-  border-bottom: 1px solid var(--highlight-color-right);
-  margin: 0 0 20px -30px;
-  padding: 15px 0 15px 30px;
-  font-weight: 300;
-  font-size: 20px;
+  border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+  margin: 0 0 24px -36px;
+  padding: 18px 0 18px 36px;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--dark-text-secondary);
+  letter-spacing: 0.5px;
 }
 
 #resume ul {
   padding-inline-start: 16px;
   margin-block-end: 0px;
   margin-block-start: 5px;
+}
+
+/* Enhanced animations for edit mode transitions */
+.edit-mode-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Floating elements */
+.floating-element {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger animation utility */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
 }
 </style>
