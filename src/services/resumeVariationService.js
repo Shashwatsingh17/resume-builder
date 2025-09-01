@@ -5,7 +5,7 @@ export class ResumeVariationService {
   static async generateVariation(resumeData, variationType) {
     try {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       const variation = this.createVariation(resumeData, variationType);
       return variation;
@@ -30,6 +30,10 @@ export class ResumeVariationService {
         return this.createSalesVariation(variation);
       case 'startup':
         return this.createStartupVariation(variation);
+      case 'consulting':
+        return this.createConsultingVariation(variation);
+      case 'finance':
+        return this.createFinanceVariation(variation);
       default:
         return this.createGeneralVariation(variation);
     }
@@ -41,30 +45,35 @@ export class ResumeVariationService {
     data.colors.right.highlight = "#10b981";
     
     // Update intro for technical focus
-    data.introText = "Passionate technologist with expertise in building scalable solutions and driving innovation through cutting-edge technologies and data-driven approaches.";
+    data.introText = "Senior technologist with deep expertise in architecting scalable systems, implementing cutting-edge solutions, and leading technical innovation through advanced engineering practices and data-driven methodologies.";
     
-    // Enhance technical skills
-    if (data.skills.includes('Python')) {
-      const pythonIndex = data.skills.indexOf('Python');
-      data.skills[pythonIndex] = 'Python (Advanced)';
+    // Update job title for technical focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Senior Data Scientist & ML Engineer';
     }
     
     // Add technical skills if not present
-    const technicalSkills = ['Docker', 'Kubernetes', 'AWS', 'Git', 'CI/CD', 'Microservices'];
+    const technicalSkills = ['Docker', 'Kubernetes', 'AWS', 'Git', 'CI/CD', 'Microservices', 'Apache Spark', 'MLOps'];
     technicalSkills.forEach(skill => {
       if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
-        data.skills.push(skill);
+        data.skills.splice(Math.floor(data.skills.length / 2), 0, skill);
       }
     });
     
     // Enhance experience descriptions with technical focus
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
-        if (desc.includes('team')) {
-          return desc.replace('team', 'cross-functional engineering team');
+        if (desc.includes('Led a team')) {
+          return desc.replace('Led a team', 'Led a cross-functional engineering team');
         }
-        if (desc.includes('developed')) {
-          return desc.replace('developed', 'architected and developed');
+        if (desc.includes('Developed and deployed')) {
+          return desc.replace('Developed and deployed', 'Architected, developed, and deployed production-grade');
+        }
+        if (desc.includes('machine learning models')) {
+          return desc.replace('machine learning models', 'scalable ML pipelines and deep learning models');
+        }
+        if (desc.includes('recommendation system')) {
+          return desc.replace('recommendation system', 'real-time recommendation engine using collaborative filtering');
         }
         return desc;
       });
@@ -79,10 +88,15 @@ export class ResumeVariationService {
     data.colors.right.highlight = "#6366f1";
     
     // Update intro for leadership focus
-    data.introText = "Strategic leader with proven track record of building high-performing teams, driving organizational growth, and delivering exceptional results in dynamic environments.";
+    data.introText = "Visionary leader with extensive experience building and scaling high-performing teams, driving strategic initiatives, and delivering transformational business results across diverse organizational environments.";
+    
+    // Update job title for leadership focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Head of Data Science & Analytics';
+    }
     
     // Add leadership skills
-    const leadershipSkills = ['Team Leadership', 'Strategic Planning', 'Stakeholder Management', 'Change Management', 'Mentoring'];
+    const leadershipSkills = ['Executive Leadership', 'Strategic Planning', 'Stakeholder Management', 'Change Management', 'Team Building', 'Performance Management'];
     leadershipSkills.forEach(skill => {
       if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
         data.skills.unshift(skill);
@@ -92,14 +106,14 @@ export class ResumeVariationService {
     // Enhance experience descriptions with leadership focus
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
-        if (desc.includes('Led')) {
-          return desc.replace('Led', 'Successfully led and mentored');
+        if (desc.includes('Led a team')) {
+          return desc.replace('Led a team', 'Successfully led and mentored a diverse team');
         }
-        if (desc.includes('team')) {
-          return desc.replace('team', 'diverse team of professionals');
+        if (desc.includes('20% increase')) {
+          return desc.replace('20% increase', '20% increase while managing stakeholder expectations and driving organizational alignment');
         }
-        if (desc.includes('developed')) {
-          return desc.replace('developed', 'spearheaded the development of');
+        if (desc.includes('Conducted')) {
+          return desc.replace('Conducted', 'Strategically planned and conducted');
         }
         return desc;
       });
@@ -114,10 +128,15 @@ export class ResumeVariationService {
     data.colors.right.highlight = "#ec4899";
     
     // Update intro for creative focus
-    data.introText = "Creative professional passionate about innovative design solutions, user experience, and bringing compelling visual stories to life through technology and artistry.";
+    data.introText = "Innovative data storyteller combining analytical rigor with creative problem-solving to transform complex datasets into compelling insights and user-centered solutions.";
+    
+    // Update job title for creative focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Data Scientist & Analytics Designer';
+    }
     
     // Add creative skills
-    const creativeSkills = ['Creative Problem Solving', 'Design Thinking', 'User Experience', 'Visual Communication', 'Innovation'];
+    const creativeSkills = ['Data Storytelling', 'Design Thinking', 'Data Visualization', 'User Experience Research', 'Creative Problem Solving', 'Visual Analytics'];
     creativeSkills.forEach(skill => {
       if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
         data.skills.unshift(skill);
@@ -127,11 +146,14 @@ export class ResumeVariationService {
     // Enhance experience descriptions with creative focus
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
-        if (desc.includes('developed')) {
-          return desc.replace('developed', 'conceptualized and developed');
+        if (desc.includes('recommendation system')) {
+          return desc.replace('recommendation system', 'intuitive recommendation system with user-centric design');
         }
-        if (desc.includes('analysis')) {
-          return desc.replace('analysis', 'creative analysis and insights');
+        if (desc.includes('statistical analysis')) {
+          return desc.replace('statistical analysis', 'innovative statistical analysis with compelling data visualizations');
+        }
+        if (desc.includes('data analysis')) {
+          return desc.replace('data analysis', 'creative data exploration and storytelling');
         }
         return desc;
       });
@@ -146,10 +168,15 @@ export class ResumeVariationService {
     data.colors.right.highlight = "#f59e0b";
     
     // Update intro for sales focus
-    data.introText = "Results-driven sales professional with exceptional relationship-building skills and a proven track record of exceeding targets and driving revenue growth.";
+    data.introText = "Results-driven data professional with exceptional client relationship skills and proven track record of translating complex analytics into revenue-generating business solutions.";
+    
+    // Update job title for sales focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Senior Data Scientist & Business Development';
+    }
     
     // Add sales skills
-    const salesSkills = ['Relationship Building', 'Negotiation', 'Revenue Growth', 'Client Management', 'Market Analysis'];
+    const salesSkills = ['Client Relationship Management', 'Business Development', 'Revenue Optimization', 'Stakeholder Engagement', 'Market Analysis', 'Presentation Skills'];
     salesSkills.forEach(skill => {
       if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
         data.skills.unshift(skill);
@@ -160,10 +187,13 @@ export class ResumeVariationService {
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
         if (desc.includes('20%')) {
-          return desc.replace('20%', '25%');
+          return desc.replace('20%', '25% while strengthening client relationships');
         }
-        if (desc.includes('revenue')) {
-          return desc.replace('revenue', 'quarterly revenue and client satisfaction');
+        if (desc.includes('boosted cross-selling')) {
+          return desc.replace('boosted cross-selling', 'drove strategic cross-selling initiatives');
+        }
+        if (desc.includes('Presented')) {
+          return desc.replace('Presented', 'Delivered compelling presentations of');
         }
         return desc;
       });
@@ -178,10 +208,15 @@ export class ResumeVariationService {
     data.colors.right.highlight = "#8b5cf6";
     
     // Update intro for startup focus
-    data.introText = "Versatile professional thriving in fast-paced startup environments, with expertise in wearing multiple hats and driving rapid growth through innovative solutions.";
+    data.introText = "Agile data scientist thriving in fast-paced startup environments, with proven ability to wear multiple hats, move fast, and drive exponential growth through data-driven innovation.";
+    
+    // Update job title for startup focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Senior Data Scientist & Growth Lead';
+    }
     
     // Add startup skills
-    const startupSkills = ['Rapid Prototyping', 'Cross-functional Collaboration', 'Agile Methodology', 'Growth Hacking', 'Adaptability'];
+    const startupSkills = ['Rapid Prototyping', 'Growth Hacking', 'Agile Development', 'Cross-functional Leadership', 'MVP Development', 'Startup Scaling'];
     startupSkills.forEach(skill => {
       if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
         data.skills.unshift(skill);
@@ -191,11 +226,14 @@ export class ResumeVariationService {
     // Enhance experience descriptions with startup focus
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
-        if (desc.includes('developed')) {
-          return desc.replace('developed', 'rapidly developed and iterated on');
+        if (desc.includes('Developed and deployed')) {
+          return desc.replace('Developed and deployed', 'Rapidly prototyped and deployed');
         }
-        if (desc.includes('team')) {
-          return desc.replace('team', 'agile startup team');
+        if (desc.includes('Led a team')) {
+          return desc.replace('Led a team', 'Built and led a lean, agile team');
+        }
+        if (desc.includes('20% increase')) {
+          return desc.replace('20% increase', '20% increase in just 6 months');
         }
         return desc;
       });
@@ -204,15 +242,97 @@ export class ResumeVariationService {
     return data;
   }
 
+  static createConsultingVariation(data) {
+    // Adjust colors for consulting roles
+    data.colors.left.highlight = "#0ea5e9";
+    data.colors.right.highlight = "#0ea5e9";
+    
+    // Update intro for consulting focus
+    data.introText = "Strategic data consultant with expertise in delivering actionable insights to C-level executives, transforming business challenges into data-driven solutions across multiple industries.";
+    
+    // Update job title for consulting focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Senior Data Science Consultant';
+    }
+    
+    // Add consulting skills
+    const consultingSkills = ['Strategic Consulting', 'Executive Communication', 'Business Intelligence', 'Client Advisory', 'Industry Analysis', 'Solution Architecture'];
+    consultingSkills.forEach(skill => {
+      if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
+        data.skills.unshift(skill);
+      }
+    });
+    
+    // Enhance experience descriptions with consulting focus
+    data.experience.forEach(exp => {
+      exp.description = exp.description.map(desc => {
+        if (desc.includes('Led a team')) {
+          return desc.replace('Led a team', 'Advised executive leadership and led cross-functional teams');
+        }
+        if (desc.includes('recommendation system')) {
+          return desc.replace('recommendation system', 'strategic recommendation framework for enterprise clients');
+        }
+        if (desc.includes('Presented')) {
+          return desc.replace('Presented', 'Delivered executive-level presentations of');
+        }
+        return desc;
+      });
+    });
+    
+    return data;
+  }
+
+  static createFinanceVariation(data) {
+    // Adjust colors for finance roles
+    data.colors.left.highlight = "#059669";
+    data.colors.right.highlight = "#059669";
+    
+    // Update intro for finance focus
+    data.introText = "Quantitative finance professional specializing in risk modeling, algorithmic trading strategies, and financial data analysis with proven track record in delivering ROI-focused solutions.";
+    
+    // Update job title for finance focus
+    if (data.title.includes('Data Scientist')) {
+      data.title = 'Quantitative Analyst & Data Scientist';
+    }
+    
+    // Add finance skills
+    const financeSkills = ['Risk Modeling', 'Financial Analysis', 'Quantitative Research', 'Portfolio Optimization', 'Algorithmic Trading', 'Regulatory Compliance'];
+    financeSkills.forEach(skill => {
+      if (!data.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))) {
+        data.skills.unshift(skill);
+      }
+    });
+    
+    // Enhance experience descriptions with finance focus
+    data.experience.forEach(exp => {
+      exp.description = exp.description.map(desc => {
+        if (desc.includes('fraud detection')) {
+          return desc.replace('fraud detection', 'financial fraud detection and risk assessment');
+        }
+        if (desc.includes('20% increase in revenue')) {
+          return desc.replace('20% increase in revenue', '20% increase in revenue with improved risk-adjusted returns');
+        }
+        if (desc.includes('statistical analysis')) {
+          return desc.replace('statistical analysis', 'quantitative financial analysis and risk modeling');
+        }
+        return desc;
+      });
+    });
+    
+    return data;
+  }
   static createGeneralVariation(data) {
     // Slight adjustments for general optimization
-    data.introText = "Dedicated professional with strong analytical skills and a passion for delivering high-quality results in collaborative environments.";
+    data.introText = "Accomplished data professional with strong analytical capabilities and proven track record of delivering impactful, data-driven solutions in collaborative, results-oriented environments.";
     
     // Enhance descriptions slightly
     data.experience.forEach(exp => {
       exp.description = exp.description.map(desc => {
-        if (desc.includes('Led')) {
-          return desc.replace('Led', 'Successfully led');
+        if (desc.includes('Led a team')) {
+          return desc.replace('Led a team', 'Successfully led and collaborated with');
+        }
+        if (desc.includes('20% increase')) {
+          return desc.replace('20% increase', '20% measurable increase');
         }
         return desc;
       });
@@ -228,6 +348,8 @@ export class ResumeVariationService {
       { name: 'Creative Focus', value: 'creative', description: 'Showcases creativity and design thinking' },
       { name: 'Sales Focus', value: 'sales', description: 'Optimized for sales and business development roles' },
       { name: 'Startup Focus', value: 'startup', description: 'Tailored for fast-paced startup environments' },
+      { name: 'Consulting Focus', value: 'consulting', description: 'Optimized for advisory roles and client-facing consulting positions' },
+      { name: 'Finance Focus', value: 'finance', description: 'Specialized for quantitative finance and financial services roles' },
       { name: 'General Optimization', value: 'general', description: 'Balanced approach suitable for various roles' }
     ];
   }

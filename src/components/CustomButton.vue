@@ -86,6 +86,11 @@ export default {
     .btn-disabled {
         opacity: 0.6;
         cursor: not-allowed;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
         pointer-events: none;
     }
 </style>

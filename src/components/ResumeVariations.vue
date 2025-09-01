@@ -34,7 +34,9 @@
       <CustomButton 
         @click="generateVariation" 
         :class="{ 'btn-disabled': !selectedVariationType }"
-        btn-type="primary">
+        btn-type="primary"
+        :disabled="!selectedVariationType">
+        :disabled="isAnalyzing">
         Generate Variation
       </CustomButton>
     </div>
@@ -68,6 +70,11 @@
 
       <div class="variation-preview">
         <div class="preview-section">
+          <h5>Updated Job Title</h5>
+          <p class="preview-text title-preview">{{ generatedVariation.title }}</p>
+        </div>
+
+        <div class="preview-section">
           <h5>Updated Introduction</h5>
           <p class="preview-text">{{ generatedVariation.introText }}</p>
         </div>
@@ -94,7 +101,7 @@
           <h5>Color Scheme</h5>
           <div class="color-preview">
             <div class="color-swatch" :style="{ backgroundColor: generatedVariation.colors.left.highlight }"></div>
-            <span>{{ getVariationTypeName(selectedVariationType) }} Theme</span>
+            <span>{{ getSelectedTypeName() }} Theme</span>
           </div>
         </div>
 
@@ -362,6 +369,13 @@ export default {
   font-size: 13px;
   line-height: 1.5;
   font-style: italic;
+}
+
+.title-preview {
+  color: var(--dark-accent);
+  font-weight: 600;
+  font-style: normal;
+  font-size: 14px;
 }
 
 .skills-preview {
