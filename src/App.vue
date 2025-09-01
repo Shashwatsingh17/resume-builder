@@ -129,6 +129,8 @@
         </CustomButton>
       </div>
 
+      <AIAnalysis :resume-data="$data" v-if="!editing" />
+
       <div
         id="resume"
         class="d-flex"
@@ -307,6 +309,7 @@ import ImgUpload from "./components/ImgUpload.vue";
 import CustomButton from "./components/CustomButton.vue";
 import ResumeEntry from "./components/ResumeEntry.vue";
 import ExportPdf from "./components/ExportPdf.vue";
+import AIAnalysis from "./components/AIAnalysis.vue";
 
 export default {
   created() {
@@ -335,6 +338,7 @@ export default {
     CustomButton,
     ResumeEntry,
     ExportPdf,
+    AIAnalysis,
   },
   data() {
     return {
