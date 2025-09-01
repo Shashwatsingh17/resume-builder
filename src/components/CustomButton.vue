@@ -82,4 +82,10 @@ export default {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
     }
+
+    .btn-disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 </style>

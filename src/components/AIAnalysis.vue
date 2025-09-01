@@ -11,7 +11,7 @@
       </h3>
       <CustomButton 
         @click="analyzeResume" 
-        :disabled="isAnalyzing"
+        :class="{ 'btn-disabled': isAnalyzing }"
         btn-type="primary">
         {{ isAnalyzing ? 'Analyzing...' : 'Analyze Resume' }}
       </CustomButton>
