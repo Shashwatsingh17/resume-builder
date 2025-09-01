@@ -131,6 +131,11 @@
 
       <AIAnalysis :resume-data="$data" v-if="!editing" />
 
+      <ResumeVariations 
+        :resume-data="$data" 
+        @apply-variation="applyVariation"
+        v-if="!editing" />
+
       <div
         id="resume"
         class="d-flex"
@@ -310,6 +315,7 @@ import CustomButton from "./components/CustomButton.vue";
 import ResumeEntry from "./components/ResumeEntry.vue";
 import ExportPdf from "./components/ExportPdf.vue";
 import AIAnalysis from "./components/AIAnalysis.vue";
+import ResumeVariations from "./components/ResumeVariations.vue";
 
 export default {
   created() {
@@ -339,6 +345,7 @@ export default {
     ResumeEntry,
     ExportPdf,
     AIAnalysis,
+    ResumeVariations,
   },
   data() {
     return {
@@ -568,6 +575,17 @@ export default {
     saveConfig() {
       localStorage.setItem("resume", JSON.stringify(this.$data));
       const message = `Your resume configuration was saved to your browser's local storage. You can close and reopen the browser and your configuration will be there. This does not work across browsers or in incognito mode. If those cases apply to you, activate export mode in the sidebar and use the download and reupload buttons there instead.`;
+      window.alert(message);
+    },
+    applyVariation(variationData) {
+      // Apply the variation to the current resume
+      this.loadIntoData(variationData);
+      
+      // Save to localStorage
+      localStorage.setItem("resume", JSON.stringify(this.$data));
+      
+      // Show confirmation
+      const message = "Resume variation has been applied successfully! Your resume has been updated with the new optimizations.";
       window.alert(message);
     },
   },
