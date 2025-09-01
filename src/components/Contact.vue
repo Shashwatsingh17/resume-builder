@@ -1,6 +1,6 @@
 <template>
-  <ul class="contact">
-    <li>
+  <ul class="contact" ref="contactList">
+    <li ref="phoneItem">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
@@ -18,7 +18,7 @@
       >
     </li>
 
-    <li>
+    <li ref="emailItem">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
@@ -35,7 +35,7 @@
       >
     </li>
 
-    <li>
+    <li ref="addressItem">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 576 512"
@@ -55,12 +55,71 @@
 </template>
 
 <script>
+import { gsap } from 'gsap';
+
 export default {
+  mounted() {
+    this.initContactAnimations();
+  },
   props: {
     iconColor: String,
     contact: Object,
     editing: Boolean,
   },
+  methods: {
+    initContactAnimations() {
+      // Animate contact items
+      const items = [this.$refs.phoneItem, this.$refs.emailItem, this.$refs.addressItem];
+      
+      items.forEach((item, index) => {
+        gsap.fromTo(item,
+          { x: -20, opacity: 0 },
+          { 
+            x: 0, 
+            opacity: 1, 
+            duration: 0.5, 
+            delay: index * 0.1,
+            ease: "power2.out" 
+          }
+        );
+
+        // Add hover animation
+        item.addEventListener('mouseenter', () => {
+          gsap.to(item, {
+            x: 6,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+          
+          // Animate icon
+          const icon = item.querySelector('svg');
+          gsap.to(icon, {
+            scale: 1.1,
+            rotation: 5,
+            duration: 0.2,
+            ease: "power2.out"
+          });
+        });
+
+        item.addEventListener('mouseleave', () => {
+          gsap.to(item, {
+            x: 0,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+          
+          // Reset icon
+          const icon = item.querySelector('svg');
+          gsap.to(icon, {
+            scale: 1,
+            rotation: 0,
+            duration: 0.2,
+            ease: "power2.out"
+          });
+        });
+      });
+    }
+  }
 };
 </script>
 
@@ -73,10 +132,24 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 12px;
-  padding: 8px 0;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  margin-bottom: 16px;
+  padding: 12px 0;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.contact li::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--highlight-color-left);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .contact li:last-child {
@@ -84,21 +157,38 @@ export default {
 }
 
 .contact li:hover {
-  background: rgba(99, 102, 241, 0.05);
-  padding-left: 8px;
-  margin-left: -8px;
-  margin-right: -8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact li:hover::before {
+  opacity: 1;
 }
 
 .contact svg {
   display: inline-block;
-  margin-right: 12px;
-  opacity: 0.9;
+  margin-right: 16px;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.contact li:hover svg {
+  opacity: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .contact span {
   flex: 1;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.contact li:hover span {
+  color: var(--highlight-color-left);
 }
 </style>
