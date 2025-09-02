@@ -1012,6 +1012,9 @@ export default {
                 if (config.currentTemplateId) {
                   this.applyTemplate(config.currentTemplateId);
                 }
+                if (config.currentThemeId) {
+                  this.currentThemeId = config.currentThemeId;
+                }
                 this.saveToLocalStorage();
                 
                 // Animate back
