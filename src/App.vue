@@ -1136,6 +1136,14 @@ export default {
           this.showImage = false;
           this.imageShape = 'round';
           break;
+        case 'overleaf-cv-tex':
+          this.colors.left.highlight = '#2a2a2a';
+          this.colors.right.highlight = '#111111';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
         default:
           break;
       }
