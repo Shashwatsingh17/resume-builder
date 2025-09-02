@@ -132,7 +132,7 @@
         </Sidebar>
 
         <!-- Resume Content -->
-        <div class="resume-wrapper" ref="resumeWrapper">
+        <div class="resume-wrapper" :class="{ 'expanded-canvas': sidebarCollapsed }" ref="resumeWrapper">
           <div class="resume-container" ref="resumeContainer">
             <div
               id="resume"
