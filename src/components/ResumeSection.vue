@@ -9,7 +9,11 @@ import { gsap } from 'gsap';
 
 export default {
     mounted() {
-        this.initSectionAnimations();
+        try {
+            this.initSectionAnimations();
+        } catch (error) {
+            console.error('ResumeSection component mount error:', error);
+        }
     },
     methods: {
         initSectionAnimations() {

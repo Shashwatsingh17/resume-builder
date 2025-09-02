@@ -133,7 +133,11 @@ import CustomButton from './CustomButton.vue';
 
 export default {
   mounted() {
-    this.initVariationsAnimations();
+    try {
+      this.initVariationsAnimations();
+    } catch (error) {
+      console.error('ResumeVariations component mount error:', error);
+    }
   },
   components: {
     CustomButton
@@ -432,7 +436,7 @@ export default {
 }
 
 .variation-preview {
-  space-y: 20px;
+  /* Variation preview container */
 }
 
 .preview-section {
@@ -556,7 +560,7 @@ export default {
 }
 
 .experience-preview {
-  space-y: 16px;
+  /* Experience preview container */
 }
 
 .experience-item {

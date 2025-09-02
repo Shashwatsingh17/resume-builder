@@ -30,7 +30,11 @@ import { gsap } from 'gsap';
 
 export default {
   mounted() {
-    this.initButtonAnimations();
+    try {
+      this.initButtonAnimations();
+    } catch (error) {
+      console.error('EditButtons component mount error:', error);
+    }
   },
   props: {
     showAddBtn: {

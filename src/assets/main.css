@@ -23,6 +23,11 @@
   --gradient-primary: linear-gradient(135deg, var(--dark-accent) 0%, #8b5cf6 100%);
   --gradient-secondary: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%);
   --blur-backdrop: blur(20px);
+  
+  /* Additional variables for resume components */
+  --highlight-color-left: var(--color-blue);
+  --highlight-color-right: var(--dark-accent);
+  --headline-weight: 700;
 }
 
 * {

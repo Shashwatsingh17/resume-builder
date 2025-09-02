@@ -56,7 +56,11 @@ import { gsap } from 'gsap';
 
 export default {
   mounted() {
-    this.initEntryAnimations();
+    try {
+      this.initEntryAnimations();
+    } catch (error) {
+      console.error('ResumeEntry component mount error:', error);
+    }
   },
   props: {
     item: Object,

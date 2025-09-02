@@ -1,6 +1,6 @@
 <template>
-    <CustomButton @click="exportPdf" btn-type="primary">
-        Export resume pdf
+    <CustomButton @click="exportPdf" btn-type="primary" :disabled="isExporting">
+        {{ isExporting ? 'Exporting...' : 'Export Resume PDF' }}
     </CustomButton>
 </template>
 
@@ -14,20 +14,52 @@ export default {
     props: {
         resumeFormat: String
     },
+    data() {
+        return {
+            isExporting: false
+        };
+    },
     methods: {
-        exportPdf() {
-            const resume = document.getElementById('resume');
-            const unit = this.resumeFormat == "a4" ? "mm" : "in";
-            const pdfConfig = {
-                margin: 0,
-                filename: 'resume',
-                jsPDF: { 
-                unit: unit,
-                format: this.resumeFormat,
-                orientation: 'portrait' 
+        async exportPdf() {
+            if (this.isExporting) return;
+            
+            try {
+                this.isExporting = true;
+                
+                // Check if html2pdf is available
+                if (typeof html2pdf === 'undefined') {
+                    throw new Error('PDF export library not loaded. Please refresh the page and try again.');
                 }
-            };
-            html2pdf().set(pdfConfig).from(resume).save()
+                
+                const resume = document.getElementById('resume');
+                if (!resume) {
+                    throw new Error('Resume element not found');
+                }
+                
+                const unit = this.resumeFormat === "a4" ? "mm" : "in";
+                const pdfConfig = {
+                    margin: [10, 10, 10, 10],
+                    filename: 'resume.pdf',
+                    jsPDF: { 
+                        unit: unit,
+                        format: this.resumeFormat,
+                        orientation: 'portrait' 
+                    },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true
+                    }
+                };
+                
+                await html2pdf().set(pdfConfig).from(resume).save();
+                
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                alert(`Failed to export PDF: ${error.message}`);
+            } finally {
+                this.isExporting = false;
+            }
         }
     }
 }

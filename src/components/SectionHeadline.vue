@@ -15,7 +15,11 @@ import { gsap } from 'gsap';
 
 export default {
     mounted() {
-        this.initHeadlineAnimations();
+        try {
+            this.initHeadlineAnimations();
+        } catch (error) {
+            console.error('SectionHeadline component mount error:', error);
+        }
     },
     props: {
         headline: {

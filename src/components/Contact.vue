@@ -62,7 +62,11 @@ import { gsap } from 'gsap';
 
 export default {
   mounted() {
-    this.initContactAnimations();
+    try {
+      this.initContactAnimations();
+    } catch (error) {
+      console.error('Contact component mount error:', error);
+    }
   },
   props: {
     iconColor: String,

@@ -12,7 +12,11 @@ import { gsap } from 'gsap';
 
 export default {
   mounted() {
-    this.initSidebarAnimations();
+    try {
+      this.initSidebarAnimations();
+    } catch (error) {
+      console.error('Sidebar component mount error:', error);
+    }
   },
   methods: {
     initSidebarAnimations() {

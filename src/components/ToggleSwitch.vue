@@ -21,7 +21,11 @@ import { gsap } from 'gsap';
 
 export default {
   mounted() {
-    this.initSwitchAnimations();
+    try {
+      this.initSwitchAnimations();
+    } catch (error) {
+      console.error('ToggleSwitch component mount error:', error);
+    }
   },
   props: {
     label: String,

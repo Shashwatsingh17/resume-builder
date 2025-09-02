@@ -427,7 +427,8 @@ export default {
       shapeOptions: [
         { name: 'Round', value: 'round' },
         { name: 'Square', value: 'square' }
-      ]
+      ],
+      currentTemplateId: 'modern-minimal' // Default template
     };
   },
   computed: {
@@ -494,46 +495,64 @@ export default {
       }, "+=0.3");
     },
     initMainAppAnimations() {
-      const tl = gsap.timeline();
-      
-      // Set initial states
-      gsap.set([this.$refs.sidebar?.$el, this.$refs.resumeWrapper], {
-        opacity: 0,
-        y: 30
-      });
-      
-      // Animate main app entrance
-      tl.to(this.$refs.mainApp, {
-        opacity: 1,
-        duration: 0.5
-      })
-      .to(this.$refs.sidebar?.$el, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out"
-      }, "-=0.3")
-      .to(this.$refs.resumeWrapper, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out"
-      }, "-=0.6");
-      
-      // Animate resume sections with stagger
-      const resumeSections = this.$refs.resume?.querySelectorAll('.resume-section');
-      if (resumeSections) {
-        gsap.fromTo(resumeSections,
-          { x: 20, opacity: 0 },
-          { 
-            x: 0, 
-            opacity: 1, 
-            duration: 0.6, 
-            stagger: 0.1, 
-            ease: "power2.out",
-            delay: 0.5
+      try {
+        const tl = gsap.timeline();
+        
+        // Set initial states with null checks
+        if (this.$refs.sidebar?.$el) {
+          gsap.set(this.$refs.sidebar.$el, { opacity: 0, y: 30 });
+        }
+        if (this.$refs.resumeWrapper) {
+          gsap.set(this.$refs.resumeWrapper, { opacity: 0, y: 30 });
+        }
+        
+        // Animate main app entrance
+        if (this.$refs.mainApp) {
+          tl.to(this.$refs.mainApp, {
+            opacity: 1,
+            duration: 0.5
+          });
+        }
+        
+        // Animate sidebar
+        if (this.$refs.sidebar?.$el) {
+          tl.to(this.$refs.sidebar.$el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+          }, "-=0.3");
+        }
+        
+        // Animate resume wrapper
+        if (this.$refs.resumeWrapper) {
+          tl.to(this.$refs.resumeWrapper, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+          }, "-=0.6");
+        }
+        
+        // Animate resume sections with stagger
+        if (this.$refs.resume) {
+          const resumeSections = this.$refs.resume.querySelectorAll('.resume-section');
+          if (resumeSections && resumeSections.length > 0) {
+            gsap.fromTo(resumeSections,
+              { x: 20, opacity: 0 },
+              { 
+                x: 0, 
+                opacity: 1, 
+                duration: 0.6, 
+                stagger: 0.1, 
+                ease: "power2.out",
+                delay: 0.5
+              }
+            );
           }
-        );
+        }
+      } catch (error) {
+        console.error('Animation error:', error);
       }
     },
     toggleEditing(isEditing) {
@@ -542,31 +561,39 @@ export default {
       this.saveToLocalStorage();
     },
     animateEditModeToggle() {
-      const resume = this.$refs.resume;
-      if (!resume) return;
-      
-      gsap.to(resume, {
-        scale: 0.98,
-        duration: 0.2,
-        ease: "power2.out",
-        yoyo: true,
-        repeat: 1,
-        onComplete: () => {
-          // Animate edit indicators
-          const editableElements = resume.querySelectorAll('[contenteditable="true"]');
-          if (this.editing && editableElements.length > 0) {
-            gsap.fromTo(editableElements,
-              { backgroundColor: 'transparent' },
-              { 
-                backgroundColor: 'rgba(99, 102, 241, 0.08)',
-                duration: 0.3,
-                stagger: 0.05,
-                ease: "power2.out"
+      try {
+        const resume = this.$refs.resume;
+        if (!resume) return;
+        
+        gsap.to(resume, {
+          scale: 0.98,
+          duration: 0.2,
+          ease: "power2.out",
+          yoyo: true,
+          repeat: 1,
+          onComplete: () => {
+            try {
+              // Animate edit indicators
+              const editableElements = resume.querySelectorAll('[contenteditable="true"]');
+              if (this.editing && editableElements.length > 0) {
+                gsap.fromTo(editableElements,
+                  { backgroundColor: 'transparent' },
+                  { 
+                    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                    duration: 0.3,
+                    stagger: 0.05,
+                    ease: "power2.out"
+                  }
+                );
               }
-            );
+            } catch (error) {
+              console.error('Edit mode animation error:', error);
+            }
           }
-        }
-      });
+        });
+      } catch (error) {
+        console.error('Edit mode toggle animation error:', error);
+      }
     },
     toggleImage(show) {
       this.showImage = show;
@@ -728,58 +755,82 @@ export default {
       return 'title'; // default fallback
     },
     animateNewItem(selector) {
-      const element = document.querySelector(selector);
-      if (element) {
-        gsap.fromTo(element,
-          { scale: 0, opacity: 0, y: -20 },
-          { 
-            scale: 1, 
-            opacity: 1, 
-            y: 0, 
-            duration: 0.5, 
-            ease: "back.out(1.7)" 
-          }
-        );
+      try {
+        const element = document.querySelector(selector);
+        if (element) {
+          gsap.fromTo(element,
+            { scale: 0, opacity: 0, y: -20 },
+            { 
+              scale: 1, 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.5, 
+              ease: "back.out(1.7)" 
+            }
+          );
+        }
+      } catch (error) {
+        console.error('New item animation error:', error);
       }
     },
     animateRemoveItem(selector, callback) {
-      const element = document.querySelector(selector);
-      if (element) {
-        gsap.to(element, {
-          scale: 0,
-          opacity: 0,
-          x: 20,
-          duration: 0.3,
-          ease: "power2.in",
-          onComplete: callback
-        });
-      } else {
+      try {
+        const element = document.querySelector(selector);
+        if (element) {
+          gsap.to(element, {
+            scale: 0,
+            opacity: 0,
+            x: 20,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: callback
+          });
+        } else {
+          callback();
+        }
+      } catch (error) {
+        console.error('Remove item animation error:', error);
         callback();
       }
     },
     applyVariation(variationData) {
-      // Animate the application of variation
-      const resume = this.$refs.resume;
-      if (resume) {
-        gsap.to(resume, {
-          scale: 0.95,
-          opacity: 0.7,
-          duration: 0.3,
-          ease: "power2.out",
-          onComplete: () => {
-            // Apply the variation data
-            Object.assign(this, variationData);
-            this.saveToLocalStorage();
-            
-            // Animate back
-            gsap.to(resume, {
-              scale: 1,
-              opacity: 1,
-              duration: 0.5,
-              ease: "back.out(1.7)"
-            });
-          }
-        });
+      try {
+        // Animate the application of variation
+        const resume = this.$refs.resume;
+        if (resume) {
+          gsap.to(resume, {
+            scale: 0.95,
+            opacity: 0.7,
+            duration: 0.3,
+            ease: "power2.out",
+            onComplete: () => {
+              try {
+                // Apply the variation data
+                Object.assign(this, variationData);
+                this.saveToLocalStorage();
+                
+                // Animate back
+                gsap.to(resume, {
+                  scale: 1,
+                  opacity: 1,
+                  duration: 0.5,
+                  ease: "back.out(1.7)"
+                });
+              } catch (error) {
+                console.error('Variation application error:', error);
+                // Reset resume appearance on error
+                gsap.to(resume, {
+                  scale: 1,
+                  opacity: 1,
+                  duration: 0.3,
+                  ease: "power2.out"
+                });
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Variation animation error:', error);
       }
     },
     downloadConfig() {
@@ -815,8 +866,18 @@ export default {
       this.$refs.fileInput?.click();
     },
     uploadConfig(event) {
-      const file = event.target.files[0];
-      if (file && file.type === 'application/json') {
+      try {
+        const file = event.target.files[0];
+        if (!file) {
+          alert('Please select a file');
+          return;
+        }
+        
+        if (file.type !== 'application/json') {
+          alert('Please select a valid JSON file');
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
@@ -824,67 +885,153 @@ export default {
             this.loadConfig(config);
           } catch (error) {
             console.error('Error parsing config file:', error);
-            alert('Invalid configuration file');
+            alert('Invalid configuration file. Please check the file format.');
           }
         };
+        
+        reader.onerror = () => {
+          alert('Error reading file. Please try again.');
+        };
+        
         reader.readAsText(file);
+      } catch (error) {
+        console.error('File upload error:', error);
+        alert('Error uploading file. Please try again.');
       }
     },
     loadConfig(config) {
-      // Animate config loading
-      const resume = this.$refs.resume;
-      if (resume) {
-        gsap.to(resume, {
-          rotationY: 90,
-          duration: 0.3,
-          ease: "power2.in",
-          onComplete: () => {
-            // Apply config
-            Object.assign(this, config);
-            this.saveToLocalStorage();
-            
-            // Animate back
-            gsap.fromTo(resume,
-              { rotationY: -90 },
-              { 
-                rotationY: 0, 
-                duration: 0.5, 
-                ease: "power2.out" 
+      try {
+        // Animate config loading
+        const resume = this.$refs.resume;
+        if (resume) {
+          gsap.to(resume, {
+            rotationY: 90,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => {
+              try {
+                // Apply config
+                Object.assign(this, config);
+                this.saveToLocalStorage();
+                
+                // Animate back
+                gsap.fromTo(resume,
+                  { rotationY: -90 },
+                  { 
+                    rotationY: 0, 
+                    duration: 0.5, 
+                    ease: "power2.out" 
+                  }
+                );
+              } catch (error) {
+                console.error('Config application error:', error);
+                // Reset resume appearance on error
+                gsap.to(resume, {
+                  rotationY: 0,
+                  duration: 0.3,
+                  ease: "power2.out"
+                });
               }
-            );
-          }
-        });
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Config loading animation error:', error);
       }
     },
     saveToLocalStorage() {
-      const data = {
-        name: this.name,
-        title: this.title,
-        introText: this.introText,
-        contact: this.contact,
-        skills: this.skills,
-        highlights: this.highlights,
-        experience: this.experience,
-        education: this.education,
-        colors: this.colors,
-        showImage: this.showImage,
-        imageShape: this.imageShape,
-        imageUrl: this.imageUrl,
-        resumeFormat: this.resumeFormat,
-        headlines: this.headlines
-      };
-      localStorage.setItem('resumeData', JSON.stringify(data));
-    },
-    loadFromLocalStorage() {
-      const saved = localStorage.getItem('resumeData');
-      if (saved) {
+      try {
+        const data = {
+          name: this.name,
+          title: this.title,
+          introText: this.introText,
+          contact: this.contact,
+          skills: this.skills,
+          highlights: this.highlights,
+          experience: this.experience,
+          education: this.education,
+          colors: this.colors,
+          showImage: this.showImage,
+          imageShape: this.imageShape,
+          imageUrl: this.imageUrl,
+          resumeFormat: this.resumeFormat,
+          headlines: this.headlines
+        };
+        localStorage.setItem('resumeData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        // Try to save with a fallback approach
         try {
-          const data = JSON.parse(saved);
-          Object.assign(this, data);
-        } catch (error) {
-          console.error('Error loading saved data:', error);
+          const simpleData = {
+            name: this.name || '',
+            title: this.title || '',
+            introText: this.introText || ''
+          };
+          localStorage.setItem('resumeData', JSON.stringify(simpleData));
+        } catch (fallbackError) {
+          console.error('Fallback save also failed:', fallbackError);
         }
       }
+    },
+    loadFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem('resumeData');
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            // Validate the data structure before applying
+            if (data && typeof data === 'object') {
+              Object.assign(this, data);
+            }
+          } catch (error) {
+            console.error('Error parsing saved data:', error);
+            // Clear corrupted data
+            localStorage.removeItem('resumeData');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading from localStorage:', error);
+      }
+    },
+    changeTemplate(templateId) {
+      this.currentTemplateId = templateId;
+      this.saveToLocalStorage();
+      
+      // Apply template-specific styles and data
+      this.applyTemplate(templateId);
+    },
+    
+    applyTemplate(templateId) {
+      switch(templateId) {
+        case 'modern-minimal':
+          this.colors.left.highlight = '#3feee6';
+          this.colors.right.highlight = '#6366f1';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'classic-professional':
+          this.colors.left.highlight = '#2c3e50';
+          this.colors.right.highlight = '#34495e';
+          this.showImage = true;
+          this.imageShape = 'square';
+          break;
+        case 'creative-bold':
+          this.colors.left.highlight = '#e74c3c';
+          this.colors.right.highlight = '#f39c12';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'clean-minimal':
+          this.colors.left.highlight = '#95a5a6';
+          this.colors.right.highlight = '#7f8c8d';
+          this.showImage = false;
+          break;
+        default:
+          break;
+      }
+      
+      // Save the updated colors
+      this.saveToLocalStorage();
     }
   }
 };

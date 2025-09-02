@@ -16,7 +16,11 @@ import { gsap } from 'gsap';
 
 export default {
     mounted() {
-        this.initButtonAnimations();
+        try {
+            this.initButtonAnimations();
+        } catch (error) {
+            console.error('CustomButton component mount error:', error);
+        }
     },
     props: {
         btnType: {

@@ -141,7 +141,11 @@ import CustomButton from './CustomButton.vue';
 
 export default {
   mounted() {
-    this.initAnalysisAnimations();
+    try {
+      this.initAnalysisAnimations();
+    } catch (error) {
+      console.error('AIAnalysis component mount error:', error);
+    }
   },
   components: {
     CustomButton
@@ -350,7 +354,7 @@ export default {
 }
 
 .analysis-results {
-  space-y: 24px;
+  /* Results container */
 }
 
 .score-card {

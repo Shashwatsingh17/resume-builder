@@ -16,7 +16,11 @@ import { gsap } from 'gsap';
 
 export default {
     mounted() {
-        this.initColorInputAnimations();
+        try {
+            this.initColorInputAnimations();
+        } catch (error) {
+            console.error('ColorInput component mount error:', error);
+        }
     },
     props: {
         label: {
