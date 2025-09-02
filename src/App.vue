@@ -1042,6 +1042,36 @@ export default {
           this.colors.right.highlight = '#7f8c8d';
           this.showImage = false;
           break;
+        case 'overleaf-awesome-cv':
+          this.colors.left.highlight = '#cc0000';
+          this.colors.right.highlight = '#2b2b2b';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-deedy':
+          this.colors.left.highlight = '#1f6feb';
+          this.colors.right.highlight = '#0d1117';
+          this.showImage = true;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-moderncv':
+          this.colors.left.highlight = '#2c3e50';
+          this.colors.right.highlight = '#18bc9c';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-classic':
+          this.colors.left.highlight = '#555555';
+          this.colors.right.highlight = '#2c3e50';
+          this.showImage = false;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-compact':
+          this.colors.left.highlight = '#7e57c2';
+          this.colors.right.highlight = '#26a69a';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
         default:
           break;
       }
