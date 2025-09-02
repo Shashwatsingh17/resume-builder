@@ -466,7 +466,10 @@ export default {
         { name: 'Square', value: 'square' }
       ],
       currentTemplateId: 'modern-minimal',
-      sidebarCollapsed: false
+      sidebarCollapsed: false,
+      layoutMode: 'two-column',
+      leftColWidthPercent: 35,
+      zoomPercent: 100
     };
   },
   computed: {
