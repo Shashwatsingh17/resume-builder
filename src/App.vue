@@ -359,7 +359,8 @@ export default {
     AIAnalysis,
     ResumeVariations,
     TemplateSelector,
-    PercentageInput
+    PercentageInput,
+    ThemeSelector
   },
   data() {
     return {
