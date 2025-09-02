@@ -23,7 +23,12 @@
     <!-- Main Application -->
     <div v-if="!isLoading" class="main-app" ref="mainApp">
       <div class="container d-flex">
-        <Sidebar ref="sidebar">
+        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed" :aria-pressed="sidebarCollapsed" aria-label="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <Sidebar ref="sidebar" :collapsed="sidebarCollapsed">
           <div class="sidebar-header" ref="sidebarHeader">
             <h1 class="app-title">
               <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
