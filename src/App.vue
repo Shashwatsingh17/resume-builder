@@ -440,7 +440,8 @@ export default {
         { name: 'Round', value: 'round' },
         { name: 'Square', value: 'square' }
       ],
-      currentTemplateId: 'modern-minimal' // Default template
+      currentTemplateId: 'modern-minimal',
+      sidebarCollapsed: false
     };
   },
   computed: {
