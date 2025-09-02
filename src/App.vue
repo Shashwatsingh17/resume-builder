@@ -992,6 +992,9 @@ export default {
             // Validate the data structure before applying
             if (data && typeof data === 'object') {
               Object.assign(this, data);
+              if (data.currentTemplateId) {
+                this.applyTemplate(data.currentTemplateId);
+              }
             }
           } catch (error) {
             console.error('Error parsing saved data:', error);
