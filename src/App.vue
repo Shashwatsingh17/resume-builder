@@ -1090,6 +1090,9 @@ export default {
               if (data.currentTemplateId) {
                 this.applyTemplate(data.currentTemplateId);
               }
+              if (data.currentThemeId) {
+                this.currentThemeId = data.currentThemeId;
+              }
             }
           } catch (error) {
             console.error('Error parsing saved data:', error);
