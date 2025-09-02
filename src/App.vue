@@ -101,6 +101,11 @@
               />
             </div>
 
+            <ThemeSelector
+              :current-theme="currentThemeId"
+              @theme-changed="changeTheme"
+            />
+
             <TemplateSelector
               :current-template="currentTemplateId"
               @template-changed="changeTemplate"
