@@ -711,6 +711,10 @@ export default {
       this.zoomPercent = Number(val);
       this.saveToLocalStorage();
     },
+    changeTheme(themeId) {
+      this.currentThemeId = themeId;
+      this.saveToLocalStorage();
+    },
     updateName(event) {
       this.name = event.target.innerText;
       this.saveToLocalStorage();
