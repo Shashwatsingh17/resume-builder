@@ -670,6 +670,18 @@ export default {
       this.colors.right.highlight = color;
       this.saveToLocalStorage();
     },
+    updateLayoutMode(val) {
+      this.layoutMode = val;
+      this.saveToLocalStorage();
+    },
+    updateLeftWidth(val) {
+      this.leftColWidthPercent = Number(val);
+      this.saveToLocalStorage();
+    },
+    updateZoom(val) {
+      this.zoomPercent = Number(val);
+      this.saveToLocalStorage();
+    },
     updateName(event) {
       this.name = event.target.innerText;
       this.saveToLocalStorage();
