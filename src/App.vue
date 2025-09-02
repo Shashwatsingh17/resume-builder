@@ -1512,6 +1512,61 @@ export default {
   position: relative;
 }
 
+/* Sidebar on right */
+.resume.layout-sidebar-right .left-col { order: 2; }
+.resume.layout-sidebar-right .right-col { order: 1; }
+
+/* Header band: full-width header, sections stacked below */
+.resume.layout-header-band { flex-direction: column; }
+.resume.layout-header-band .header-section {
+  margin-bottom: 24px;
+  padding: 24px 32px;
+  background: var(--dark-accent-light);
+  border-bottom: 2px solid var(--highlight-color-right);
+  border-top: 2px solid var(--highlight-color-right);
+}
+.resume.layout-header-band .right-col,
+.resume.layout-header-band .left-col { width: 100%; }
+
+/* Stacked cards: sections in cards with gaps */
+.resume.layout-stacked { flex-direction: column; gap: 20px; }
+.resume.layout-stacked .left-col,
+.resume.layout-stacked .right-col {
+  width: 100%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Timeline: single column emphasis on experience */
+.resume.layout-timeline { flex-direction: column; }
+.resume.layout-timeline .right-col { width: 100%; }
+.resume.layout-timeline .left-col { width: 100%; order: 2; }
+.resume.layout-timeline .experience-list { position: relative; }
+.resume.layout-timeline .experience-list::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--highlight-color-right);
+  opacity: 0.4;
+}
+.resume.layout-timeline .experience-list .inner-section { padding-left: 36px; position: relative; }
+.resume.layout-timeline .experience-list .inner-section::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--highlight-color-right);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
 .right-col::before {
   content: '';
   position: absolute;
