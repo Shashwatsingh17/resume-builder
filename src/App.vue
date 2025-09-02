@@ -322,7 +322,8 @@ export default {
     ExportPdf,
     CustomButton,
     AIAnalysis,
-    ResumeVariations
+    ResumeVariations,
+    TemplateSelector
   },
   data() {
     return {
