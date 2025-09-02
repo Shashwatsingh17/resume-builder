@@ -150,6 +150,72 @@ export default {
           },
           showImage: false,
           imageShape: 'square'
+        },
+        {
+          id: 'altacv',
+          name: 'AltaCV',
+          description: 'Clean two-column CV with vibrant cyan accents',
+          colors: {
+            left: '#00bcd4',
+            right: '#263238'
+          },
+          showImage: true,
+          imageShape: 'round'
+        },
+        {
+          id: 'twenty-seconds',
+          name: 'Twenty Seconds',
+          description: 'Bold header strip with readable single column',
+          colors: {
+            left: '#7c3aed',
+            right: '#312e81'
+          },
+          showImage: false,
+          imageShape: 'round'
+        },
+        {
+          id: 'classicthesis',
+          name: 'Classicthesis',
+          description: 'Academic, understated tones with strong headings',
+          colors: {
+            left: '#6b7280',
+            right: '#374151'
+          },
+          showImage: false,
+          imageShape: 'square'
+        },
+        {
+          id: 'timeline',
+          name: 'Timeline',
+          description: 'Single-column timeline-focused layout',
+          colors: {
+            left: '#059669',
+            right: '#065f46'
+          },
+          showImage: false,
+          imageShape: 'round'
+        },
+        {
+          id: 'material',
+          name: 'Material',
+          description: 'Card-like sections with teal and indigo accents',
+          colors: {
+            left: '#009688',
+            right: '#3f51b5'
+          },
+          showImage: true,
+          imageShape: 'square'
+        },
+        {
+          id: 'monochrome',
+          name: 'Monochrome',
+          description: 'High-contrast black and white minimalist',
+          colors: {
+            left: '#111827',
+            right: '#111827'
+          },
+          showImage: false,
+          imageShape: 'square'
         }
       ]
     };
@@ -317,6 +383,11 @@ export default {
 .template-option:nth-child(7) { animation-delay: 0.7s; }
 .template-option:nth-child(8) { animation-delay: 0.8s; }
 .template-option:nth-child(9) { animation-delay: 0.9s; }
+.template-option:nth-child(10) { animation-delay: 1.0s; }
+.template-option:nth-child(11) { animation-delay: 1.1s; }
+.template-option:nth-child(12) { animation-delay: 1.2s; }
+.template-option:nth-child(13) { animation-delay: 1.3s; }
+.template-option:nth-child(14) { animation-delay: 1.4s; }
 
 @keyframes fadeInUp {
   to {
