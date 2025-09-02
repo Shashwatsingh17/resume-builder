@@ -45,6 +45,7 @@ export default {
 };
 </script>
 
+
 <style>
 .sidebar {
   width: 340px;

@@ -1,257 +1,322 @@
 <template>
-  <div class="container" :class="{ 'edit-off': !editing }">
-    <!-- Sidebar -->
-    <Sidebar :collapsed="sidebarCollapsed">
-      <!-- Template Selection -->
-      <div class="sidebar-section">
-        <TemplateSelector 
-          :currentTemplate="currentTemplate"
-          @template-changed="applyTemplate"
-        />
-      </div>
-
-      <!-- Theme Selection -->
-      <div class="sidebar-section">
-        <ThemeSelector 
-          :currentTheme="currentTheme"
-          @theme-changed="changeTheme"
-        />
-      </div>
-
-      <!-- Edit Mode Toggle -->
-      <div class="sidebar-section">
-        <ToggleSwitch 
-          label="Edit Mode" 
-          :toggleActive="editing" 
-          @switchToggled="editing = $event"
-        />
-      </div>
-
-      <!-- Image Settings -->
-      <div class="sidebar-section" v-if="showImageSettings">
-        <h3 class="section-title">Profile Image</h3>
-        <ToggleSwitch 
-          label="Show Image" 
-          :toggleActive="showImage" 
-          @switchToggled="showImage = $event"
-        />
-        <div v-if="showImage">
-          <ImgUpload @imageChanged="imageUrl = $event" />
-          <SelectInput 
-            label="Image Shape"
-            :options="imageShapeOptions"
-            :defaultOption="imageShape"
-            @updateSelection="imageShape = $event"
-          />
+  <div id="app" ref="app">
+    <!-- Loading Screen -->
+    <div v-if="isLoading" class="loading-screen" ref="loadingScreen">
+      <div class="loading-content">
+        <div class="loading-logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
+        <h1 class="loading-title">Resume Builder</h1>
+        <div class="loading-bar">
+          <div class="loading-progress" ref="loadingProgress"></div>
+        </div>
+        <p class="loading-text">Preparing your workspace...</p>
       </div>
+    </div>
 
-      <!-- Color Customization -->
-      <div class="sidebar-section">
-        <h3 class="section-title">Colors</h3>
-        <ColorInput 
-          label="Left Column Color"
-          :defaultColor="colors.left.highlight"
-          @colorChanged="colors.left.highlight = $event"
-        />
-        <ColorInput 
-          label="Right Column Color"
-          :defaultColor="colors.right.highlight"
-          @colorChanged="colors.right.highlight = $event"
-        />
-      </div>
-
-      <!-- Export Options -->
-      <div class="sidebar-section">
-        <h3 class="section-title">Export</h3>
-        <SelectInput 
-          label="Paper Format"
-          :options="paperFormatOptions"
-          :defaultOption="resumeFormat"
-          @updateSelection="resumeFormat = $event"
-        />
-        <ExportPdf :resumeFormat="resumeFormat" />
-      </div>
-
-      <!-- Data Management -->
-      <div class="sidebar-section">
-        <h3 class="section-title">Data</h3>
-        <CustomButton @click="downloadData" btn-type="secondary">
-          Download JSON
-        </CustomButton>
-        <label class="file-upload-label">
-          <input type="file" accept=".json" @change="uploadData" style="display: none;">
-          <CustomButton btn-type="secondary">Upload JSON</CustomButton>
-        </label>
-      </div>
-
-      <!-- AI Features -->
-      <div class="sidebar-section">
-        <h3 class="section-title">AI Tools</h3>
-        <AIAnalysis :resumeData="resumeData" />
-        <ResumeVariations 
-          :resumeData="resumeData" 
-          @apply-variation="applyVariation"
-        />
-      </div>
-    </Sidebar>
-
-    <!-- Main Resume Content -->
-    <div class="main-content" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
-      <div id="resume" class="resume-container" :class="currentTemplate">
-        <!-- Resume content based on template -->
-        <div v-if="currentTemplate === 'modern-minimal'" class="modern-minimal-layout">
-          <!-- Left Column -->
-          <div class="left-col">
-            <ProfilePic 
-              :url="imageUrl" 
-              :show="showImage" 
-              :shape="imageShape"
-            />
-            
-            <div 
-              class="name"
-              :contenteditable="editing"
-              @blur="editField($event, 'name')"
-            >
-              {{ name }}
-            </div>
-            
-            <div 
-              class="title"
-              :contenteditable="editing"
-              @blur="editField($event, 'title')"
-            >
-              {{ title }}
-            </div>
-
-            <div 
-              class="intro-text"
-              :contenteditable="editing"
-              @blur="editField($event, 'introText')"
-            >
-              {{ introText }}
-            </div>
-
-            <!-- Contact Section -->
-            <ResumeSection>
-              <SectionHeadline 
-                headline="Contact" 
-                :editing="editing"
-                @headlineEdited="editHeadline($event, 'contact')"
-              />
-              <Contact 
-                :contact="contact" 
-                :editing="editing" 
-                :iconColor="colors.left.highlight"
-                @edit="editContactField"
-              />
-            </ResumeSection>
-
-            <!-- Skills Section -->
-            <ResumeSection>
-              <SectionHeadline 
-                headline="Skills" 
-                :editing="editing"
-                @headlineEdited="editHeadline($event, 'skills')"
-              />
-              <ul class="skills-list">
-                <li v-for="(skill, index) in skills" :key="index">
-                  <span
-                    :contenteditable="editing"
-                    @blur="editSkill($event, index)"
-                  >
-                    {{ skill }}
-                  </span>
-                </li>
-              </ul>
-              <EditButtons 
-                v-if="editing"
-                @addClick="addSkill"
-                @removeClick="removeSkill"
-                textAdd="Add Skill"
-                textRemove="Remove Skill"
-              />
-            </ResumeSection>
-
-            <!-- Certifications Section -->
-            <ResumeSection>
-              <SectionHeadline 
-                headline="Certifications" 
-                :editing="editing"
-                @headlineEdited="editHeadline($event, 'highlights')"
-              />
-              <ul class="highlights-list">
-                <li v-for="(highlight, index) in highlights" :key="index">
-                  <span
-                    :contenteditable="editing"
-                    @blur="editHighlight($event, index)"
-                  >
-                    {{ highlight }}
-                  </span>
-                </li>
-              </ul>
-              <EditButtons 
-                v-if="editing"
-                @addClick="addHighlight"
-                @removeClick="removeHighlight"
-                textAdd="Add Certification"
-                textRemove="Remove Certification"
-              />
-            </ResumeSection>
+    <!-- Main Application -->
+    <div v-if="!isLoading" class="main-app" :class="themeClass" ref="mainApp">
+      <div class="container d-flex">
+        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed" :aria-pressed="sidebarCollapsed" aria-label="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <Sidebar ref="sidebar" :collapsed="sidebarCollapsed">
+          <div class="sidebar-header" ref="sidebarHeader">
+            <h1 class="app-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Resume Builder
+            </h1>
+            <p class="app-subtitle">Create your perfect resume</p>
           </div>
 
-          <!-- Right Column -->
-          <div class="right-col">
-            <!-- Experience Section -->
-            <ResumeSection>
-              <SectionHeadline 
-                headline="Experience" 
-                :editing="editing"
-                @headlineEdited="editHeadline($event, 'experience')"
-              />
-              <ResumeEntry
-                v-for="(exp, index) in experience"
-                :key="index"
-                :item="exp"
-                :editing="editing"
-                @edit="editExperienceField($event, index, $event)"
-                @editDesc="editExperienceDescription($event, index, $event)"
-              />
-              <EditButtons 
-                v-if="editing"
-                @addClick="addExperience"
-                @removeClick="removeExperience"
-                textAdd="Add Experience"
-                textRemove="Remove Experience"
-                btnAlign="left"
-              />
-            </ResumeSection>
+          <!-- Edit Mode Toggle -->
+          <div class="sidebar-section" ref="editSection">
+            <ToggleSwitch
+              label="Edit Mode"
+              off-label="Export Mode"
+              :toggle-active="editing"
+              @switch-toggled="toggleEditing"
+            />
+          </div>
 
-            <!-- Education Section -->
-            <ResumeSection>
-              <SectionHeadline 
-                headline="Education" 
-                :editing="editing"
-                @headlineEdited="editHeadline($event, 'education')"
+          <!-- Export Options -->
+          <div v-if="!editing" class="sidebar-section" ref="exportSection">
+            <h3 class="section-title">Export Options</h3>
+            
+            <SelectInput
+              label="Paper Format"
+              :options="formatOptions"
+              :default-option="resumeFormat"
+              @update-selection="updateResumeFormat"
+            />
+            
+            <ExportPdf :resume-format="resumeFormat" />
+            
+            <div class="export-actions">
+              <CustomButton @click="downloadConfig" btn-type="secondary">
+                Download Config
+              </CustomButton>
+              <CustomButton @click="triggerFileUpload" btn-type="secondary">
+                Upload Config
+              </CustomButton>
+              <input
+                ref="fileInput"
+                type="file"
+                accept=".json"
+                @change="uploadConfig"
+                style="display: none"
               />
-              <ResumeEntry
-                v-for="(edu, index) in education"
-                :key="index"
-                :item="edu"
-                :editing="editing"
-                @edit="editEducationField($event, index, $event)"
-                @editDesc="editEducationDescription($event, index, $event)"
+            </div>
+          </div>
+
+          <!-- Edit Options -->
+          <div v-if="editing" class="sidebar-section" ref="editOptionsSection">
+            <h3 class="section-title">Customization</h3>
+            
+            <ToggleSwitch
+              label="Show Profile Picture"
+              :toggle-active="showImage"
+              @switch-toggled="toggleImage"
+            />
+
+            <div v-if="showImage" class="image-controls" ref="imageControls">
+              <ImgUpload @image-changed="updateImage" />
+              
+              <SelectInput
+                label="Image Shape"
+                :options="shapeOptions"
+                :default-option="imageShape"
+                @update-selection="updateImageShape"
               />
-              <EditButtons 
-                v-if="editing"
-                @addClick="addEducation"
-                @removeClick="removeEducation"
-                textAdd="Add Education"
-                textRemove="Remove Education"
-                btnAlign="left"
+            </div>
+
+            <ThemeSelector
+              :current-theme="currentThemeId"
+              @theme-changed="changeTheme"
+            />
+
+            <TemplateSelector
+              :current-template="currentTemplateId"
+              @template-changed="changeTemplate"
+            />
+
+            <div class="layout-controls" ref="layoutControls">
+              <SelectInput
+                label="Layout"
+                :options="[{ name: 'Two Column', value: 'two-column' }, { name: 'Single Column', value: 'single-column' }]"
+                :default-option="layoutMode"
+                @update-selection="updateLayoutMode"
               />
-            </ResumeSection>
+              <PercentageInput
+                label="Left Column Width"
+                :min="20"
+                :max="60"
+                :current-value="leftColWidthPercent"
+                @percentage-changed="updateLeftWidth"
+              />
+              <PercentageInput
+                label="Zoom"
+                :min="75"
+                :max="140"
+                :current-value="zoomPercent"
+                @percentage-changed="updateZoom"
+              />
+            </div>
+
+            <div class="color-controls" ref="colorControls">
+              <ColorInput
+                label="Left Column Color"
+                :default-color="colors.left.highlight"
+                @color-changed="updateLeftColor"
+              />
+              
+              <ColorInput
+                label="Right Column Color"
+                :default-color="colors.right.highlight"
+                @color-changed="updateRightColor"
+              />
+            </div>
+          </div>
+
+          <!-- AI Features -->
+          <div v-if="!editing" class="sidebar-section" ref="aiSection">
+            <AIAnalysis :resume-data="resumeData" />
+            <ResumeVariations 
+              :resume-data="resumeData" 
+              @apply-variation="applyVariation"
+            />
+          </div>
+        </Sidebar>
+
+        <!-- Resume Content -->
+        <div class="resume-wrapper" :class="{ 'expanded-canvas': sidebarCollapsed }" ref="resumeWrapper">
+          <div class="resume-container" ref="resumeContainer">
+            <div
+              id="resume"
+              ref="resume"
+              class="resume"
+              :class="[currentTemplateId, layoutModeClass, templateLayoutClass, { 'edit-mode': editing }]"
+              :style="cssVars"
+            >
+              <div class="left-col" ref="leftCol">
+                <ProfilePic
+                  :url="imageUrl"
+                  :show="showImage"
+                  :shape="imageShape"
+                />
+
+                <ResumeSection>
+                  <SectionHeadline
+                    headline="Contact"
+                    :editing="editing"
+                    @headline-edited="updateHeadline('contact', $event)"
+                  />
+                  <Contact
+                    :icon-color="colors.left.highlight"
+                    :contact="contact"
+                    :editing="editing"
+                    @edit="updateContact"
+                  />
+                </ResumeSection>
+
+                <ResumeSection>
+                  <SectionHeadline
+                    headline="Skills"
+                    :editing="editing"
+                    @headline-edited="updateHeadline('skills', $event)"
+                  />
+                  <ul class="skills-list" ref="skillsList">
+                    <li
+                      v-for="(skill, index) in skills"
+                      :key="index"
+                      class="skill-item"
+                      :contenteditable="editing"
+                      @blur="updateSkill(index, $event)"
+                    >
+                      {{ skill }}
+                    </li>
+                  </ul>
+                  <EditButtons
+                    v-if="editing"
+                    @add-click="addSkill"
+                    @remove-click="removeSkill"
+                  />
+                </ResumeSection>
+
+                <ResumeSection>
+                  <SectionHeadline
+                    headline="Certifications"
+                    :editing="editing"
+                    @headline-edited="updateHeadline('certifications', $event)"
+                  />
+                  <ul class="highlights-list" ref="highlightsList">
+                    <li
+                      v-for="(highlight, index) in highlights"
+                      :key="index"
+                      class="highlight-item"
+                      :contenteditable="editing"
+                      @blur="updateHighlight(index, $event)"
+                    >
+                      {{ highlight }}
+                    </li>
+                  </ul>
+                  <EditButtons
+                    v-if="editing"
+                    @add-click="addHighlight"
+                    @remove-click="removeHighlight"
+                  />
+                </ResumeSection>
+              </div>
+
+              <div class="right-col" ref="rightCol">
+                <div class="header-section" ref="headerSection">
+                  <h1
+                    class="name"
+                    :contenteditable="editing"
+                    @blur="updateName"
+                    ref="nameElement"
+                  >
+                    {{ name }}
+                  </h1>
+                  <h2
+                    class="title"
+                    :contenteditable="editing"
+                    @blur="updateTitle"
+                    ref="titleElement"
+                  >
+                    {{ title }}
+                  </h2>
+                </div>
+
+                <ResumeSection>
+                  <div
+                    class="intro-text"
+                    :contenteditable="editing"
+                    @blur="updateIntroText"
+                    ref="introElement"
+                  >
+                    {{ introText }}
+                  </div>
+                </ResumeSection>
+
+                <ResumeSection>
+                  <SectionHeadline
+                    headline="Experience"
+                    :editing="editing"
+                    @headline-edited="updateHeadline('experience', $event)"
+                  />
+                  <div class="experience-list" ref="experienceList">
+                    <ResumeEntry
+                      v-for="(exp, index) in experience"
+                      :key="index"
+                      :item="exp"
+                      :editing="editing"
+                      @edit="updateExperience(index, $event, $event.target.innerText)"
+                      @edit-desc="updateExperienceDesc(index, $event, $event.target.innerText)"
+                    />
+                  </div>
+                  <EditButtons
+                    v-if="editing"
+                    @add-click="addExperience"
+                    @remove-click="removeExperience"
+                  />
+                </ResumeSection>
+
+                <ResumeSection>
+                  <SectionHeadline
+                    headline="Education"
+                    :editing="editing"
+                    @headline-edited="updateHeadline('education', $event)"
+                  />
+                  <div class="education-list" ref="educationList">
+                    <ResumeEntry
+                      v-for="(edu, index) in education"
+                      :key="index"
+                      :item="edu"
+                      :editing="editing"
+                      @edit="updateEducation(index, $event, $event.target.innerText)"
+                      @edit-desc="updateEducationDesc(index, $event, $event.target.innerText)"
+                    />
+                  </div>
+                  <EditButtons
+                    v-if="editing"
+                    @add-click="addEducation"
+                    @remove-click="removeEducation"
+                  />
+                </ResumeSection>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -261,527 +326,1324 @@
 
 <script>
 import { gsap } from 'gsap';
-
-// Components
 import Sidebar from './components/Sidebar.vue';
-import TemplateSelector from './components/TemplateSelector.vue';
-import ThemeSelector from './components/ThemeSelector.vue';
+import Contact from './components/Contact.vue';
+import ProfilePic from './components/ProfilePic.vue';
+import ResumeSection from './components/ResumeSection.vue';
+import SectionHeadline from './components/SectionHeadline.vue';
+import ResumeEntry from './components/ResumeEntry.vue';
+import EditButtons from './components/EditButtons.vue';
 import ToggleSwitch from './components/ToggleSwitch.vue';
-import ImgUpload from './components/ImgUpload.vue';
 import SelectInput from './components/SelectInput.vue';
+import PercentageInput from './components/PercentageInput.vue';
 import ColorInput from './components/ColorInput.vue';
+import ImgUpload from './components/ImgUpload.vue';
 import ExportPdf from './components/ExportPdf.vue';
 import CustomButton from './components/CustomButton.vue';
 import AIAnalysis from './components/AIAnalysis.vue';
 import ResumeVariations from './components/ResumeVariations.vue';
-import ProfilePic from './components/ProfilePic.vue';
-import ResumeSection from './components/ResumeSection.vue';
-import SectionHeadline from './components/SectionHeadline.vue';
-import Contact from './components/Contact.vue';
-import ResumeEntry from './components/ResumeEntry.vue';
-import EditButtons from './components/EditButtons.vue';
+import TemplateSelector from './components/TemplateSelector.vue';
+import ThemeSelector from './components/ThemeSelector.vue';
 
 export default {
+  name: 'App',
   components: {
     Sidebar,
-    TemplateSelector,
-    ThemeSelector,
+    Contact,
+    ProfilePic,
+    ResumeSection,
+    SectionHeadline,
+    ResumeEntry,
+    EditButtons,
     ToggleSwitch,
-    ImgUpload,
     SelectInput,
     ColorInput,
+    ImgUpload,
     ExportPdf,
     CustomButton,
     AIAnalysis,
     ResumeVariations,
-    ProfilePic,
-    ResumeSection,
-    SectionHeadline,
-    Contact,
-    ResumeEntry,
-    EditButtons
-  },
-  mounted() {
-    try {
-      this.loadData();
-      this.initAppAnimations();
-    } catch (error) {
-      console.error('App component mount error:', error);
-    }
+    TemplateSelector,
+    PercentageInput,
+    ThemeSelector
   },
   data() {
     return {
-      editing: false,
-      sidebarCollapsed: false,
-      currentTemplate: 'modern-minimal',
-      currentTheme: 'dark-neon',
-      
-      // Resume data
-      name: "Jane Doe",
-      title: "Senior Data Scientist",
-      introText: "Experienced data scientist with expertise in machine learning, statistical analysis, and data visualization. Passionate about turning complex data into actionable insights.",
-      
-      imageUrl: "/profile_pic.jpg",
+      isLoading: true,
+      editing: true,
       showImage: true,
-      imageShape: "round",
-      
-      colors: {
-        left: { highlight: "#3feee6" },
-        right: { highlight: "#6366f1" }
-      },
-      
+      imageShape: 'round',
+      imageUrl: '/profile_pic.jpg',
+      resumeFormat: 'a4',
+      name: 'Jane Smith',
+      title: 'Senior Data Scientist',
+      introText: 'Experienced data scientist with a passion for transforming complex datasets into actionable business insights. Proven track record in machine learning, statistical analysis, and data visualization.',
       contact: {
-        phone: "+1 (555) 123-4567",
-        email: "jane.doe@email.com",
-        address: "San Francisco, CA"
+        phone: '+1 (555) 123-4567',
+        email: 'jane.smith@email.com',
+        address: 'San Francisco, CA'
       },
-      
       skills: [
-        "Python", "R", "SQL", "Machine Learning", "Deep Learning",
-        "Data Visualization", "Statistical Analysis", "TensorFlow",
-        "Pandas", "Scikit-learn", "Tableau", "Power BI"
+        'Python',
+        'R',
+        'SQL',
+        'Machine Learning',
+        'Data Visualization',
+        'Statistical Analysis',
+        'TensorFlow',
+        'Pandas',
+        'Scikit-learn',
+        'Tableau'
       ],
-      
       highlights: [
-        "AWS Certified Machine Learning Specialist",
-        "Google Analytics Certified",
-        "Certified Data Management Professional (CDMP)"
+        'AWS Certified Data Analytics',
+        'Google Cloud Professional Data Engineer',
+        'Certified Analytics Professional (CAP)',
+        'Published researcher in Nature Machine Intelligence'
       ],
-      
       experience: [
         {
-          title: "Senior Data Scientist",
-          company: "TechCorp Inc.",
-          location: "San Francisco, CA",
-          date: "2021 - Present",
+          title: 'Senior Data Scientist',
+          company: 'TechCorp Inc.',
+          location: 'San Francisco, CA',
+          date: '2021 - Present',
           description: [
-            "Led a team of 5 data scientists in developing machine learning models for customer segmentation",
-            "Developed and deployed a recommendation system that boosted cross-selling by 20%",
-            "Conducted statistical analysis on large datasets to identify business opportunities"
+            'Led a team of 5 data scientists in developing predictive models that increased revenue by 20%',
+            'Developed and deployed machine learning models for fraud detection, reducing false positives by 35%',
+            'Collaborated with cross-functional teams to implement data-driven solutions across multiple business units'
           ]
         },
         {
-          title: "Data Analyst",
-          company: "DataSolutions LLC",
-          location: "San Francisco, CA", 
-          date: "2019 - 2021",
+          title: 'Data Scientist',
+          company: 'DataFlow Solutions',
+          location: 'Palo Alto, CA',
+          date: '2019 - 2021',
           description: [
-            "Built automated reporting dashboards using Python and SQL",
-            "Performed A/B testing analysis for product optimization",
-            "Collaborated with cross-functional teams to define KPIs and metrics"
+            'Built recommendation system that boosted cross-selling by 25%',
+            'Conducted statistical analysis on customer behavior data to identify key growth opportunities',
+            'Presented findings to C-level executives, influencing strategic business decisions'
           ]
         }
       ],
-      
       education: [
         {
-          title: "Master of Science in Data Science",
-          university: "Stanford University",
-          location: "Stanford, CA",
-          date: "2017 - 2019",
+          title: 'M.S. in Data Science',
+          university: 'Stanford University',
+          location: 'Stanford, CA',
+          date: '2017 - 2019',
           description: [
-            "Specialized in machine learning and statistical modeling",
-            "Thesis: 'Deep Learning Applications in Natural Language Processing'"
+            'Specialized in Machine Learning and Statistical Computing',
+            'Thesis: "Deep Learning Applications in Financial Forecasting"',
+            'GPA: 3.9/4.0'
           ]
         },
         {
-          title: "Bachelor of Science in Computer Science",
-          university: "UC Berkeley",
-          location: "Berkeley, CA",
-          date: "2013 - 2017",
+          title: 'B.S. in Computer Science',
+          university: 'UC Berkeley',
+          location: 'Berkeley, CA',
+          date: '2013 - 2017',
           description: [
-            "Graduated Magna Cum Laude",
-            "Relevant coursework: Algorithms, Data Structures, Statistics"
+            'Magna Cum Laude',
+            'Relevant Coursework: Algorithms, Data Structures, Statistics',
+            'President of Data Science Club'
           ]
         }
       ],
-      
-      resumeFormat: "a4",
-      
-      // Options
-      imageShapeOptions: [
-        { name: "Round", value: "round" },
-        { name: "Square", value: "square" }
+      colors: {
+        left: {
+          highlight: '#3feee6'
+        },
+        right: {
+          highlight: '#6366f1'
+        }
+      },
+      headlines: {
+        contact: 'Contact',
+        skills: 'Skills',
+        certifications: 'Certifications',
+        experience: 'Experience',
+        education: 'Education'
+      },
+      formatOptions: [
+        { name: 'A4', value: 'a4' },
+        { name: 'US Letter', value: 'letter' }
       ],
-      
-      paperFormatOptions: [
-        { name: "A4", value: "a4" },
-        { name: "US Letter", value: "letter" }
-      ]
+      shapeOptions: [
+        { name: 'Round', value: 'round' },
+        { name: 'Square', value: 'square' }
+      ],
+      currentTemplateId: 'modern-minimal',
+      sidebarCollapsed: false,
+      layoutMode: 'two-column',
+      leftColWidthPercent: 35,
+      zoomPercent: 100,
+      currentThemeId: 'dark-neon'
     };
   },
   computed: {
+    layoutModeClass() {
+      return this.layoutMode === 'single-column' ? 'single-column' : 'two-column';
+    },
+    templateLayoutClass() {
+      switch (this.currentTemplateId) {
+        case 'twenty-seconds':
+          return 'layout-header-band';
+        case 'material':
+          return 'layout-stacked';
+        case 'timeline':
+          return 'layout-timeline';
+        case 'overleaf-deedy':
+          return 'layout-sidebar-right';
+        default:
+          return 'layout-default';
+      }
+    },
+    themeClass() {
+      return `theme-${this.currentThemeId}`;
+    },
+    cssVars() {
+      const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
+      const right = 100 - left;
+      const zoom = Math.max(75, Math.min(140, Number(this.zoomPercent)));
+      return {
+        '--highlight-color-left': this.colors.left.highlight,
+        '--highlight-color-right': this.colors.right.highlight,
+        '--headline-weight': this.editing ? '600' : '700',
+        '--left-col-width': left + '%',
+        '--right-col-width': right + '%',
+        '--resume-zoom-scale': (zoom / 100).toString()
+      };
+    },
     resumeData() {
       return {
         name: this.name,
         title: this.title,
         introText: this.introText,
-        imageUrl: this.imageUrl,
-        showImage: this.showImage,
         contact: this.contact,
         skills: this.skills,
         highlights: this.highlights,
         experience: this.experience,
         education: this.education,
-        colors: this.colors
+        showImage: this.showImage,
+        imageUrl: this.imageUrl,
+        colors: this.colors,
+        currentTemplateId: this.currentTemplateId,
+        layoutMode: this.layoutMode,
+        leftColWidthPercent: this.leftColWidthPercent,
+        zoomPercent: this.zoomPercent,
+        currentThemeId: this.currentThemeId
       };
-    },
-    showImageSettings() {
-      return ['modern-minimal', 'classic-professional', 'creative-bold'].includes(this.currentTemplate);
     }
   },
-  watch: {
-    colors: {
-      handler() {
-        this.updateCSSVariables();
-      },
-      deep: true
-    },
-    currentTheme() {
-      this.applyTheme();
-    }
+  mounted() {
+    this.initApp();
   },
   methods: {
-    initAppAnimations() {
-      // Animate main content entrance
-      gsap.fromTo('.main-content',
-        { x: 50, opacity: 0 },
-        { x: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 0.3 }
-      );
+    async initApp() {
+      // Load saved data
+      this.loadFromLocalStorage();
+      
+      // Simulate loading time for smooth UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Start loading animation
+      this.animateLoading();
+      
+      // Hide loading screen after animation
+      setTimeout(() => {
+        this.isLoading = false;
+        this.$nextTick(() => {
+          this.initMainAppAnimations();
+        });
+      }, 2000);
     },
-    
-    // Template methods
-    applyTemplate(templateId) {
-      this.currentTemplate = templateId;
+    animateLoading() {
+      const tl = gsap.timeline();
       
-      // Apply template-specific settings
-      const templates = {
-        'modern-minimal': {
-          colors: { left: { highlight: '#3feee6' }, right: { highlight: '#6366f1' } },
-          showImage: true,
-          imageShape: 'round'
-        },
-        'classic-professional': {
-          colors: { left: { highlight: '#2c3e50' }, right: { highlight: '#34495e' } },
-          showImage: true,
-          imageShape: 'square'
-        },
-        'creative-bold': {
-          colors: { left: { highlight: '#e74c3c' }, right: { highlight: '#f39c12' } },
-          showImage: true,
-          imageShape: 'round'
-        },
-        'clean-minimal': {
-          colors: { left: { highlight: '#95a5a6' }, right: { highlight: '#7f8c8d' } },
-          showImage: false,
-          imageShape: 'round'
+      // Animate loading progress
+      tl.to(this.$refs.loadingProgress, {
+        width: '100%',
+        duration: 1.5,
+        ease: "power2.inOut"
+      });
+      
+      // Fade out loading screen
+      tl.to(this.$refs.loadingScreen, {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.inOut"
+      }, "+=0.3");
+    },
+    initMainAppAnimations() {
+      try {
+        const tl = gsap.timeline();
+        
+        // Set initial states with null checks
+        if (this.$refs.sidebar?.$el) {
+          gsap.set(this.$refs.sidebar.$el, { opacity: 0, y: 30 });
         }
-      };
-      
-      if (templates[templateId]) {
-        Object.assign(this, templates[templateId]);
+        if (this.$refs.resumeWrapper) {
+          gsap.set(this.$refs.resumeWrapper, { opacity: 0, y: 30 });
+        }
+        
+        // Animate main app entrance
+        if (this.$refs.mainApp) {
+          tl.to(this.$refs.mainApp, {
+            opacity: 1,
+            duration: 0.5
+          });
+        }
+        
+        // Animate sidebar
+        if (this.$refs.sidebar?.$el) {
+          tl.to(this.$refs.sidebar.$el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+          }, "-=0.3");
+        }
+        
+        // Animate resume wrapper
+        if (this.$refs.resumeWrapper) {
+          tl.to(this.$refs.resumeWrapper, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+          }, "-=0.6");
+        }
+        
+        // Animate resume sections with stagger
+        if (this.$refs.resume) {
+          const resumeSections = this.$refs.resume.querySelectorAll('.resume-section');
+          if (resumeSections && resumeSections.length > 0) {
+            gsap.fromTo(resumeSections,
+              { x: 20, opacity: 0 },
+              { 
+                x: 0, 
+                opacity: 1, 
+                duration: 0.6, 
+                stagger: 0.1, 
+                ease: "power2.out",
+                delay: 0.5
+              }
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Animation error:', error);
       }
-      
-      this.saveData();
     },
-    
-    // Theme methods
+    toggleEditing(isEditing) {
+      this.editing = isEditing;
+      this.animateEditModeToggle();
+      this.saveToLocalStorage();
+    },
+    animateEditModeToggle() {
+      try {
+        const resume = this.$refs.resume;
+        if (!resume) return;
+        
+        gsap.to(resume, {
+          scale: 0.98,
+          duration: 0.2,
+          ease: "power2.out",
+          yoyo: true,
+          repeat: 1,
+          onComplete: () => {
+            try {
+              // Animate edit indicators
+              const editableElements = resume.querySelectorAll('[contenteditable="true"]');
+              if (this.editing && editableElements.length > 0) {
+                gsap.fromTo(editableElements,
+                  { backgroundColor: 'transparent' },
+                  { 
+                    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                    duration: 0.3,
+                    stagger: 0.05,
+                    ease: "power2.out"
+                  }
+                );
+              }
+            } catch (error) {
+              console.error('Edit mode animation error:', error);
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Edit mode toggle animation error:', error);
+      }
+    },
+    toggleImage(show) {
+      this.showImage = show;
+      this.saveToLocalStorage();
+    },
+    updateImage(imageData) {
+      this.imageUrl = imageData;
+      this.saveToLocalStorage();
+    },
+    updateImageShape(shape) {
+      this.imageShape = shape;
+      this.saveToLocalStorage();
+    },
+    updateResumeFormat(format) {
+      this.resumeFormat = format;
+      this.saveToLocalStorage();
+    },
+    updateLeftColor(color) {
+      this.colors.left.highlight = color;
+      this.saveToLocalStorage();
+    },
+    updateRightColor(color) {
+      this.colors.right.highlight = color;
+      this.saveToLocalStorage();
+    },
+    updateLayoutMode(val) {
+      this.layoutMode = val;
+      this.saveToLocalStorage();
+    },
+    updateLeftWidth(val) {
+      this.leftColWidthPercent = Number(val);
+      this.saveToLocalStorage();
+    },
+    updateZoom(val) {
+      this.zoomPercent = Number(val);
+      this.saveToLocalStorage();
+    },
     changeTheme(themeId) {
-      this.currentTheme = themeId;
-      this.applyTheme();
+      this.currentThemeId = themeId;
+      this.saveToLocalStorage();
     },
-    
-    applyTheme() {
-      const themes = {
-        'dark-neon': {
-          '--dark-bg-primary': '#0f0f23',
-          '--dark-bg-secondary': '#16213e',
-          '--dark-accent': '#6366f1'
-        },
-        'minimal-light': {
-          '--dark-bg-primary': '#ffffff',
-          '--dark-bg-secondary': '#f8fafc',
-          '--dark-accent': '#3b82f6'
-        }
-      };
-      
-      if (themes[this.currentTheme]) {
-        Object.entries(themes[this.currentTheme]).forEach(([property, value]) => {
-          document.documentElement.style.setProperty(property, value);
+    updateName(event) {
+      this.name = event.target.innerText;
+      this.saveToLocalStorage();
+    },
+    updateTitle(event) {
+      this.title = event.target.innerText;
+      this.saveToLocalStorage();
+    },
+    updateIntroText(event) {
+      this.introText = event.target.innerText;
+      this.saveToLocalStorage();
+    },
+    updateContact(event, section, field) {
+      this.contact[field] = event.target.innerText;
+      this.saveToLocalStorage();
+    },
+    updateHeadline(section, newText) {
+      this.headlines[section] = newText;
+      this.saveToLocalStorage();
+    },
+    updateSkill(index, event) {
+      this.skills[index] = event.target.innerText;
+      this.saveToLocalStorage();
+    },
+    addSkill() {
+      this.skills.push('New Skill');
+      this.$nextTick(() => {
+        this.animateNewItem('.skill-item:last-child');
+      });
+      this.saveToLocalStorage();
+    },
+    removeSkill() {
+      if (this.skills.length > 0) {
+        this.animateRemoveItem('.skill-item:last-child', () => {
+          this.skills.pop();
+          this.saveToLocalStorage();
         });
       }
     },
-    
-    // Variation methods
-    applyVariation(variation) {
-      Object.assign(this, variation);
-      this.saveData();
-    },
-    
-    // Edit methods
-    editField(event, field) {
-      this[field] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editContactField(event, section, field) {
-      this[section][field] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editHeadline(newText, section) {
-      // Handle headline editing if needed
-      this.saveData();
-    },
-    
-    editSkill(event, index) {
-      this.skills[index] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editHighlight(event, index) {
+    updateHighlight(index, event) {
       this.highlights[index] = event.target.innerText;
-      this.saveData();
+      this.saveToLocalStorage();
     },
-    
-    editExperienceField(event, index, field) {
-      this.experience[index][field] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editExperienceDescription(event, expIndex, descIndex) {
-      this.experience[expIndex].description[descIndex] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editEducationField(event, index, field) {
-      this.education[index][field] = event.target.innerText;
-      this.saveData();
-    },
-    
-    editEducationDescription(event, eduIndex, descIndex) {
-      this.education[eduIndex].description[descIndex] = event.target.innerText;
-      this.saveData();
-    },
-    
-    // Add/Remove methods
-    addSkill() {
-      this.skills.push("New Skill");
-      this.saveData();
-    },
-    
-    removeSkill() {
-      if (this.skills.length > 0) {
-        this.skills.pop();
-        this.saveData();
-      }
-    },
-    
     addHighlight() {
-      this.highlights.push("New Certification");
-      this.saveData();
+      this.highlights.push('New Certification');
+      this.$nextTick(() => {
+        this.animateNewItem('.highlight-item:last-child');
+      });
+      this.saveToLocalStorage();
     },
-    
     removeHighlight() {
       if (this.highlights.length > 0) {
-        this.highlights.pop();
-        this.saveData();
+        this.animateRemoveItem('.highlight-item:last-child', () => {
+          this.highlights.pop();
+          this.saveToLocalStorage();
+        });
       }
     },
-    
-    addExperience() {
-      this.experience.push({
-        title: "Job Title",
-        company: "Company Name",
-        location: "Location",
-        date: "Start - End",
-        description: ["Job description"]
-      });
-      this.saveData();
+    updateExperience(index, event, newText) {
+      const field = event.target.getAttribute('data-field') || this.getFieldFromEvent(event);
+      this.experience[index][field] = newText;
+      this.saveToLocalStorage();
     },
-    
+    updateExperienceDesc(index, event, newText) {
+      const descIndex = parseInt(event.target.getAttribute('data-desc-index')) || 0;
+      this.experience[index].description[descIndex] = newText;
+      this.saveToLocalStorage();
+    },
+    addExperience() {
+      const newExp = {
+        title: 'Job Title',
+        company: 'Company Name',
+        location: 'Location',
+        date: 'Start - End',
+        description: ['Job description and achievements']
+      };
+      this.experience.push(newExp);
+      this.$nextTick(() => {
+        this.animateNewItem('.experience-list .inner-section:last-child');
+      });
+      this.saveToLocalStorage();
+    },
     removeExperience() {
       if (this.experience.length > 0) {
-        this.experience.pop();
-        this.saveData();
+        this.animateRemoveItem('.experience-list .inner-section:last-child', () => {
+          this.experience.pop();
+          this.saveToLocalStorage();
+        });
       }
     },
-    
-    addEducation() {
-      this.education.push({
-        title: "Degree",
-        university: "University Name",
-        location: "Location",
-        date: "Start - End",
-        description: ["Education description"]
-      });
-      this.saveData();
+    updateEducation(index, event, newText) {
+      const field = event.target.getAttribute('data-field') || this.getFieldFromEvent(event);
+      this.education[index][field] = newText;
+      this.saveToLocalStorage();
     },
-    
+    updateEducationDesc(index, event, newText) {
+      const descIndex = parseInt(event.target.getAttribute('data-desc-index')) || 0;
+      this.education[index].description[descIndex] = newText;
+      this.saveToLocalStorage();
+    },
+    addEducation() {
+      const newEdu = {
+        title: 'Degree',
+        university: 'University Name',
+        location: 'Location',
+        date: 'Start - End',
+        description: ['Relevant coursework and achievements']
+      };
+      this.education.push(newEdu);
+      this.$nextTick(() => {
+        this.animateNewItem('.education-list .inner-section:last-child');
+      });
+      this.saveToLocalStorage();
+    },
     removeEducation() {
       if (this.education.length > 0) {
-        this.education.pop();
-        this.saveData();
+        this.animateRemoveItem('.education-list .inner-section:last-child', () => {
+          this.education.pop();
+          this.saveToLocalStorage();
+        });
       }
     },
-    
-    // Data management
-    saveData() {
-      try {
-        localStorage.setItem('resumeData', JSON.stringify(this.resumeData));
-      } catch (error) {
-        console.error('Error saving data:', error);
+    getFieldFromEvent(event) {
+      // Determine field based on element class or position
+      const element = event.target;
+      if (element.classList.contains('resumeentry-title')) return 'title';
+      if (element.classList.contains('resumeentry-date')) return 'date';
+      if (element.classList.contains('resumeentry-location')) {
+        // Check if it's the first or second span in location
+        const parent = element.parentElement;
+        const spans = parent.querySelectorAll('span');
+        return spans[0] === element ? 'company' : 'location';
       }
+      return 'title'; // default fallback
     },
-    
-    loadData() {
+    animateNewItem(selector) {
       try {
-        const saved = localStorage.getItem('resumeData');
-        if (saved) {
-          const data = JSON.parse(saved);
-          Object.assign(this, data);
+        const element = document.querySelector(selector);
+        if (element) {
+          gsap.fromTo(element,
+            { scale: 0, opacity: 0, y: -20 },
+            { 
+              scale: 1, 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.5, 
+              ease: "back.out(1.7)" 
+            }
+          );
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('New item animation error:', error);
       }
     },
-    
-    downloadData() {
-      const dataStr = JSON.stringify(this.resumeData, null, 2);
+    animateRemoveItem(selector, callback) {
+      try {
+        const element = document.querySelector(selector);
+        if (element) {
+          gsap.to(element, {
+            scale: 0,
+            opacity: 0,
+            x: 20,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: callback
+          });
+        } else {
+          callback();
+        }
+      } catch (error) {
+        console.error('Remove item animation error:', error);
+        callback();
+      }
+    },
+    applyVariation(variationData) {
+      try {
+        // Animate the application of variation
+        const resume = this.$refs.resume;
+        if (resume) {
+          gsap.to(resume, {
+            scale: 0.95,
+            opacity: 0.7,
+            duration: 0.3,
+            ease: "power2.out",
+            onComplete: () => {
+              try {
+                // Apply the variation data
+                Object.assign(this, variationData);
+                this.saveToLocalStorage();
+                
+                // Animate back
+                gsap.to(resume, {
+                  scale: 1,
+                  opacity: 1,
+                  duration: 0.5,
+                  ease: "back.out(1.7)"
+                });
+              } catch (error) {
+                console.error('Variation application error:', error);
+                // Reset resume appearance on error
+                gsap.to(resume, {
+                  scale: 1,
+                  opacity: 1,
+                  duration: 0.3,
+                  ease: "power2.out"
+                });
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Variation animation error:', error);
+      }
+    },
+    downloadConfig() {
+      const config = {
+        name: this.name,
+        title: this.title,
+        introText: this.introText,
+        contact: this.contact,
+        skills: this.skills,
+        highlights: this.highlights,
+        experience: this.experience,
+        education: this.education,
+        colors: this.colors,
+        showImage: this.showImage,
+        imageShape: this.imageShape,
+        imageUrl: this.imageUrl,
+        resumeFormat: this.resumeFormat,
+        headlines: this.headlines,
+        currentTemplateId: this.currentTemplateId,
+        layoutMode: this.layoutMode,
+        leftColWidthPercent: this.leftColWidthPercent,
+        zoomPercent: this.zoomPercent,
+        currentThemeId: this.currentThemeId
+      };
+      
+      const dataStr = JSON.stringify(config, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
+      
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'resume-data.json';
+      link.download = 'resume-config.json';
       link.click();
+      
       URL.revokeObjectURL(url);
     },
-    
-    uploadData(event) {
-      const file = event.target.files[0];
-      if (file) {
+    triggerFileUpload() {
+      this.$refs.fileInput?.click();
+    },
+    uploadConfig(event) {
+      try {
+        const file = event.target.files[0];
+        if (!file) {
+          alert('Please select a file');
+          return;
+        }
+        
+        if (file.type !== 'application/json') {
+          alert('Please select a valid JSON file');
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
-            const data = JSON.parse(e.target.result);
-            Object.assign(this, data);
-            this.saveData();
+            const config = JSON.parse(e.target.result);
+            this.loadConfig(config);
           } catch (error) {
-            alert('Invalid JSON file');
+            console.error('Error parsing config file:', error);
+            alert('Invalid configuration file. Please check the file format.');
           }
         };
+        
+        reader.onerror = () => {
+          alert('Error reading file. Please try again.');
+        };
+        
         reader.readAsText(file);
+      } catch (error) {
+        console.error('File upload error:', error);
+        alert('Error uploading file. Please try again.');
       }
     },
+    loadConfig(config) {
+      try {
+        // Animate config loading
+        const resume = this.$refs.resume;
+        if (resume) {
+          gsap.to(resume, {
+            rotationY: 90,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => {
+              try {
+                // Apply config
+                Object.assign(this, config);
+                if (config.currentTemplateId) {
+                  this.applyTemplate(config.currentTemplateId);
+                }
+                if (config.currentThemeId) {
+                  this.currentThemeId = config.currentThemeId;
+                }
+                this.saveToLocalStorage();
+                
+                // Animate back
+                gsap.fromTo(resume,
+                  { rotationY: -90 },
+                  { 
+                    rotationY: 0, 
+                    duration: 0.5, 
+                    ease: "power2.out" 
+                  }
+                );
+              } catch (error) {
+                console.error('Config application error:', error);
+                // Reset resume appearance on error
+                gsap.to(resume, {
+                  rotationY: 0,
+                  duration: 0.3,
+                  ease: "power2.out"
+                });
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Config loading animation error:', error);
+      }
+    },
+    saveToLocalStorage() {
+      try {
+        const data = {
+          name: this.name,
+          title: this.title,
+          introText: this.introText,
+          contact: this.contact,
+          skills: this.skills,
+          highlights: this.highlights,
+          experience: this.experience,
+          education: this.education,
+          colors: this.colors,
+          showImage: this.showImage,
+          imageShape: this.imageShape,
+          imageUrl: this.imageUrl,
+          resumeFormat: this.resumeFormat,
+          headlines: this.headlines,
+          currentTemplateId: this.currentTemplateId,
+          layoutMode: this.layoutMode,
+          leftColWidthPercent: this.leftColWidthPercent,
+          zoomPercent: this.zoomPercent,
+          currentThemeId: this.currentThemeId
+        };
+        localStorage.setItem('resumeData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        // Try to save with a fallback approach
+        try {
+          const simpleData = {
+            name: this.name || '',
+            title: this.title || '',
+            introText: this.introText || ''
+          };
+          localStorage.setItem('resumeData', JSON.stringify(simpleData));
+        } catch (fallbackError) {
+          console.error('Fallback save also failed:', fallbackError);
+        }
+      }
+    },
+    loadFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem('resumeData');
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            // Validate the data structure before applying
+            if (data && typeof data === 'object') {
+              Object.assign(this, data);
+              if (data.currentTemplateId) {
+                this.applyTemplate(data.currentTemplateId);
+              }
+              if (data.currentThemeId) {
+                this.currentThemeId = data.currentThemeId;
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing saved data:', error);
+            // Clear corrupted data
+            localStorage.removeItem('resumeData');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading from localStorage:', error);
+      }
+    },
+    changeTemplate(templateId) {
+      this.currentTemplateId = templateId;
+      this.saveToLocalStorage();
+      
+      // Apply template-specific styles and data
+      this.applyTemplate(templateId);
+    },
     
-    updateCSSVariables() {
-      document.documentElement.style.setProperty('--highlight-color-left', this.colors.left.highlight);
-      document.documentElement.style.setProperty('--highlight-color-right', this.colors.right.highlight);
+    applyTemplate(templateId) {
+      switch(templateId) {
+        case 'modern-minimal':
+          this.colors.left.highlight = '#3feee6';
+          this.colors.right.highlight = '#6366f1';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'classic-professional':
+          this.colors.left.highlight = '#2c3e50';
+          this.colors.right.highlight = '#34495e';
+          this.showImage = true;
+          this.imageShape = 'square';
+          break;
+        case 'creative-bold':
+          this.colors.left.highlight = '#e74c3c';
+          this.colors.right.highlight = '#f39c12';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'clean-minimal':
+          this.colors.left.highlight = '#95a5a6';
+          this.colors.right.highlight = '#7f8c8d';
+          this.showImage = false;
+          break;
+        case 'overleaf-awesome-cv':
+          this.colors.left.highlight = '#cc0000';
+          this.colors.right.highlight = '#2b2b2b';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-deedy':
+          this.colors.left.highlight = '#1f6feb';
+          this.colors.right.highlight = '#0d1117';
+          this.showImage = true;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-moderncv':
+          this.colors.left.highlight = '#2c3e50';
+          this.colors.right.highlight = '#18bc9c';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-classic':
+          this.colors.left.highlight = '#555555';
+          this.colors.right.highlight = '#2c3e50';
+          this.showImage = false;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-compact':
+          this.colors.left.highlight = '#7e57c2';
+          this.colors.right.highlight = '#26a69a';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-cv-tex':
+          this.colors.left.highlight = '#2a2a2a';
+          this.colors.right.highlight = '#111111';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        case 'altacv':
+          this.colors.left.highlight = '#00bcd4';
+          this.colors.right.highlight = '#263238';
+          this.showImage = true;
+          this.imageShape = 'round';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 32;
+          break;
+        case 'twenty-seconds':
+          this.colors.left.highlight = '#7c3aed';
+          this.colors.right.highlight = '#312e81';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 28;
+          break;
+        case 'classicthesis':
+          this.colors.left.highlight = '#6b7280';
+          this.colors.right.highlight = '#374151';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        case 'timeline':
+          this.colors.left.highlight = '#059669';
+          this.colors.right.highlight = '#065f46';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 26;
+          break;
+        case 'material':
+          this.colors.left.highlight = '#009688';
+          this.colors.right.highlight = '#3f51b5';
+          this.showImage = true;
+          this.imageShape = 'square';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 38;
+          break;
+        case 'monochrome':
+          this.colors.left.highlight = '#111827';
+          this.colors.right.highlight = '#111827';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        default:
+          break;
+      }
+      
+      // Save the updated colors
+      this.saveToLocalStorage();
     }
   }
 };
 </script>
 
-<style>
-/* CSS Variables for dynamic colors */
-:root {
-  --highlight-color-left: #3feee6;
-  --highlight-color-right: #6366f1;
+<style scoped>
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--dark-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.main-content {
-  flex: 1;
-  margin-left: 340px;
+.loading-content {
+  text-align: center;
+  max-width: 400px;
   padding: 40px;
-  transition: margin-left 0.3s ease;
-  min-height: 100vh;
 }
 
-.main-content.sidebar-collapsed {
-  margin-left: 80px;
+.loading-logo {
+  margin-bottom: 32px;
 }
 
-.resume-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  background: var(--glass-bg-primary);
-  backdrop-filter: var(--blur-backdrop);
-  border: 1px solid var(--dark-border-light);
-  border-radius: 24px;
+.logo-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--dark-accent);
+  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.3));
+  animation: float 3s ease-in-out infinite;
+}
+
+.loading-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--dark-text-primary);
+  margin: 0 0 32px 0;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--dark-border);
+  border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.loading-progress {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-primary);
+  border-radius: 2px;
   position: relative;
 }
 
-.resume-container::before {
+.loading-progress::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+.loading-text {
+  color: var(--dark-text-secondary);
+  font-size: 14px;
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Main App */
+.main-app {
+  opacity: 0;
+  min-height: 100vh;
+}
+
+.container {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--dark-text-primary);
+  background: var(--gradient-primary);
+  border: 1px solid var(--dark-border-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.sidebar-toggle:active {
+  transform: translateY(0);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.sidebar-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
   height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-text-primary);
+  margin: 0 0 8px 0;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--dark-accent);
+  filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+}
+
+.app-subtitle {
+  color: var(--dark-text-secondary);
+  font-size: 14px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark-text-primary);
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Export Actions */
+.export-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.export-actions .btn {
+  font-size: 12px;
+  padding: 12px 20px;
+}
+
+/* Image Controls */
+.image-controls {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.color-controls {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Resume Wrapper */
+.resume-wrapper {
+  flex: 1;
+  margin-left: 340px;
+  padding: 40px;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  opacity: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.resume-wrapper.expanded-canvas {
+  margin-left: 80px;
+}
+
+.resume-container {
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+}
+
+/* Resume Styles */
+.resume {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: var(--color-black);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  backdrop-filter: blur(20px);
+}
+
+.resume::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
   background: var(--gradient-primary);
 }
 
-.modern-minimal-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
+.resume.edit-mode {
+  box-shadow: 
+    0 30px 60px rgba(99, 102, 241, 0.2),
+    0 0 0 2px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: scale(1.02);
+}
+
+.resume {
+  display: flex;
   min-height: 800px;
+  transform: scale(var(--resume-zoom-scale, 1));
+  transform-origin: top center;
 }
 
 .left-col {
-  background: var(--gradient-secondary);
-  padding: 40px 36px;
-  border-right: 1px solid var(--dark-border-light);
+  width: var(--left-col-width, 35%);
+  background: linear-gradient(180deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%);
+  color: var(--dark-text-primary);
+  padding: 48px 36px;
   position: relative;
+  overflow: hidden;
 }
 
 .left-col::before {
   content: '';
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
-  width: 1px;
-  height: 100%;
-  background: linear-gradient(180deg, var(--highlight-color-left) 0%, transparent 100%);
-  opacity: 0.6;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .right-col {
-  padding: 40px 36px;
-  background: var(--dark-bg-primary);
+  width: var(--right-col-width, 65%);
+  padding: 48px 40px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  position: relative;
+}
+
+/* Sidebar on right */
+.resume.layout-sidebar-right .left-col { order: 2; }
+.resume.layout-sidebar-right .right-col { order: 1; }
+
+/* Header band: full-width header, sections stacked below */
+.resume.layout-header-band { flex-direction: column; }
+.resume.layout-header-band .header-section {
+  margin-bottom: 24px;
+  padding: 24px 32px;
+  background: var(--dark-accent-light);
+  border-bottom: 2px solid var(--highlight-color-right);
+  border-top: 2px solid var(--highlight-color-right);
+}
+.resume.layout-header-band .right-col,
+.resume.layout-header-band .left-col { width: 100%; }
+
+/* Stacked cards: sections in cards with gaps */
+.resume.layout-stacked { flex-direction: column; gap: 20px; }
+.resume.layout-stacked .left-col,
+.resume.layout-stacked .right-col {
+  width: 100%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Timeline: single column emphasis on experience */
+.resume.layout-timeline { flex-direction: column; }
+.resume.layout-timeline .right-col { width: 100%; }
+.resume.layout-timeline .left-col { width: 100%; order: 2; }
+.resume.layout-timeline .experience-list { position: relative; }
+.resume.layout-timeline .experience-list::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--highlight-color-right);
+  opacity: 0.4;
+}
+.resume.layout-timeline .experience-list .inner-section { padding-left: 36px; position: relative; }
+.resume.layout-timeline .experience-list .inner-section::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--highlight-color-right);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.right-col::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Header Section */
+.header-section {
+  margin-bottom: 40px;
+  text-align: center;
+  position: relative;
 }
 
 .name {
-  font-size: 28px;
+  font-size: 42px;
   font-weight: 800;
-  color: var(--dark-text-primary);
-  margin-bottom: 12px;
-  text-align: center;
-  letter-spacing: -0.5px;
-  transition: all 0.2s ease;
+  color: var(--highlight-color-right);
+  margin: 0 0 12px 0;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--highlight-color-right) 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--highlight-color-left);
-  margin-bottom: 24px;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.2s ease;
+  font-size: 20px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
 }
 
 .intro-text {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.7;
-  color: var(--dark-text-secondary);
-  margin-bottom: 32px;
+  color: #475569;
   text-align: justify;
-  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
 }
 
+/* Skills and Highlights Lists */
 .skills-list,
 .highlights-list {
   list-style: none;
@@ -789,69 +1651,110 @@ export default {
   margin: 0;
 }
 
-.skills-list li,
-.highlights-list li {
-  background: rgba(255, 255, 255, 0.05);
-  margin-bottom: 8px;
+.skill-item,
+.highlight-item {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--dark-text-primary);
   padding: 12px 16px;
-  border-radius: 8px;
+  margin-bottom: 10px;
+  border-radius: 10px;
   font-size: 14px;
-  font-weight: 500;
-  border-left: 3px solid var(--highlight-color-left);
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
+  overflow: hidden;
 }
 
-.skills-list li:hover,
-.highlights-list li:hover {
-  background: rgba(255, 255, 255, 0.08);
+.skill-item::before,
+.highlight-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--highlight-color-left);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.skill-item:hover,
+.highlight-item:hover {
+  background: rgba(255, 255, 255, 0.15);
   transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive design */
+.skill-item:hover::before,
+.highlight-item:hover::before {
+  opacity: 1;
+}
+
+/* Responsive Design */
 @media (max-width: 1200px) {
-  .main-content {
+  .resume-wrapper {
+    margin-left: 320px;
+    padding: 30px 20px;
+  }
+  
+  .sidebar {
+    width: 320px;
+  }
+}
+
+.resume.single-column {
+  flex-direction: column;
+}
+
+.single-column .left-col,
+.single-column .right-col {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .resume-wrapper {
     margin-left: 0;
     padding: 20px;
   }
   
-  .modern-minimal-layout {
-    grid-template-columns: 1fr;
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
   }
   
-  .left-col {
-    border-right: none;
-    border-bottom: 1px solid var(--dark-border-light);
-  }
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    padding: 16px;
+  .resume {
+    flex-direction: column;
   }
   
   .left-col,
   .right-col {
-    padding: 24px;
+    width: 100%;
   }
   
   .name {
-    font-size: 24px;
-  }
-  
-  .title {
-    font-size: 14px;
+    font-size: 32px;
   }
 }
 
-/* File upload styling */
-.file-upload-label {
-  display: block;
-  margin-bottom: 14px;
+/* Animation Keyframes */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-.file-upload-label input {
-  display: none;
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 </style>
