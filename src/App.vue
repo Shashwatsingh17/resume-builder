@@ -303,6 +303,7 @@ import ExportPdf from './components/ExportPdf.vue';
 import CustomButton from './components/CustomButton.vue';
 import AIAnalysis from './components/AIAnalysis.vue';
 import ResumeVariations from './components/ResumeVariations.vue';
+import TemplateSelector from './components/TemplateSelector.vue';
 
 export default {
   name: 'App',
