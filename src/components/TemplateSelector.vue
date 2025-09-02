@@ -84,6 +84,61 @@ export default {
           },
           showImage: false,
           imageShape: 'round'
+        },
+        {
+          id: 'overleaf-awesome-cv',
+          name: 'Awesome CV',
+          description: 'Bold section accents and compact typography',
+          colors: {
+            left: '#cc0000',
+            right: '#2b2b2b'
+          },
+          showImage: false,
+          imageShape: 'round'
+        },
+        {
+          id: 'overleaf-deedy',
+          name: 'Deedy Resume',
+          description: 'Modern two-column layout with vivid blue',
+          colors: {
+            left: '#1f6feb',
+            right: '#0d1117'
+          },
+          showImage: true,
+          imageShape: 'square'
+        },
+        {
+          id: 'overleaf-moderncv',
+          name: 'moderncv',
+          description: 'Professional palette with highlight accents',
+          colors: {
+            left: '#2c3e50',
+            right: '#18bc9c'
+          },
+          showImage: true,
+          imageShape: 'round'
+        },
+        {
+          id: 'overleaf-classic',
+          name: 'Classic CV',
+          description: 'Traditional grayscale focused on content',
+          colors: {
+            left: '#555555',
+            right: '#2c3e50'
+          },
+          showImage: false,
+          imageShape: 'square'
+        },
+        {
+          id: 'overleaf-compact',
+          name: 'Compact',
+          description: 'Space-efficient layout with vibrant accents',
+          colors: {
+            left: '#7e57c2',
+            right: '#26a69a'
+          },
+          showImage: false,
+          imageShape: 'round'
         }
       ]
     };
