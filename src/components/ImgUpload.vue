@@ -15,17 +15,24 @@ export default {
     changeImage(event) {
       try {
         const input = event.target;
-        const selectedFile = input.files && input.files[0];
-        if (!selectedFile) return;
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-          // Emit both camelCase and kebab-case for Vue 3 case-sensitive listeners
-          this.$emit('imageChanged', reader.result);
-          this.$emit('image-changed', reader.result);
-          // Reset input to allow re-selecting the same file
+        const file = input.files && input.files[0];
+        if (!file) return;
+        // Prefer ObjectURL for speed and broad support (works on localhost)
+        try {
+          const objectUrl = URL.createObjectURL(file);
+          this.$emit('imageChanged', objectUrl);
+          this.$emit('image-changed', objectUrl);
+        } catch (_) {
+          // Fallback to Data URL
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.$emit('imageChanged', reader.result);
+            this.$emit('image-changed', reader.result);
+          };
+          reader.readAsDataURL(file);
+        } finally {
           input.value = '';
-        });
-        reader.readAsDataURL(selectedFile);
+        }
       } catch (e) {
         console.error('Image upload error:', e);
       }
