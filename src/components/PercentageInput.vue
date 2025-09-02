@@ -5,7 +5,7 @@
             :max="max"
             :value="currentValue"
             class="custom-input"
-            @change="$emit('percentageChanged', $event.target.value)"
+            @change="onChange"
         >
         % {{ label }}
     </label>
@@ -28,6 +28,13 @@ export default {
         },
         currentValue: {
             default: 0
+        }
+    },
+    methods: {
+        onChange(e) {
+            const val = e.target.value;
+            this.$emit('percentageChanged', val);
+            this.$emit('percentage-changed', val);
         }
     }
 }
