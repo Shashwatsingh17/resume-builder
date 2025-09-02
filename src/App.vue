@@ -349,6 +349,7 @@ import AIAnalysis from './components/AIAnalysis.vue';
 import ResumeVariations from './components/ResumeVariations.vue';
 import TemplateSelector from './components/TemplateSelector.vue';
 import ThemeSelector from './components/ThemeSelector.vue';
+import HomePage from './components/HomePage.vue';
 
 export default {
   name: 'App',
@@ -370,11 +371,13 @@ export default {
     ResumeVariations,
     TemplateSelector,
     PercentageInput,
-    ThemeSelector
+    ThemeSelector,
+    HomePage
   },
   data() {
     return {
       isLoading: true,
+      showHome: true,
       editing: true,
       showImage: true,
       imageShape: 'round',
@@ -556,9 +559,13 @@ export default {
       
       // Hide loading screen after animation
       setTimeout(() => {
+        const skipped = localStorage.getItem('skipHome') === 'true';
+        this.showHome = !skipped;
         this.isLoading = false;
         this.$nextTick(() => {
-          this.initMainAppAnimations();
+          if (!this.showHome) {
+            this.initMainAppAnimations();
+          }
         });
       }, 2000);
     },
@@ -892,6 +899,20 @@ export default {
       } catch (error) {
         console.error('Remove item animation error:', error);
         callback();
+      }
+    },
+    handleStart({ skipNext }) {
+      try {
+        if (skipNext) {
+          localStorage.setItem('skipHome', 'true');
+        }
+        this.showHome = false;
+        this.$nextTick(() => {
+          this.initMainAppAnimations();
+        });
+      } catch (e) {
+        console.error('Error starting app:', e);
+        this.showHome = false;
       }
     },
     applyVariation(variationData) {
