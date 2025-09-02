@@ -33,6 +33,11 @@
             <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
+        <button class="home-toggle" @click="goHome" aria-label="Go to home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2V9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
         <Sidebar ref="sidebar" :collapsed="sidebarCollapsed">
           <div class="sidebar-header" ref="sidebarHeader">
             <h1 class="app-title">
@@ -915,6 +920,30 @@ export default {
         this.showHome = false;
       }
     },
+    goHome() {
+      try {
+        if (this.$refs.mainApp) {
+          gsap.to(this.$refs.mainApp, {
+            opacity: 0,
+            duration: 0.2,
+            ease: "power2.inOut",
+            onComplete: () => {
+              this.showHome = true;
+              this.$nextTick(() => {
+                if (this.$refs.homeApp) {
+                  gsap.fromTo(this.$refs.homeApp, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                }
+              });
+            }
+          });
+        } else {
+          this.showHome = true;
+        }
+      } catch (e) {
+        console.error('Error going home:', e);
+        this.showHome = true;
+      }
+    },
     applyVariation(variationData) {
       try {
         // Animate the application of variation
@@ -1783,4 +1812,23 @@ export default {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+.home-toggle {
+  position: fixed;
+  top: 16px;
+  left: 64px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--dark-text-primary);
+  background: var(--gradient-primary);
+  border: 1px solid var(--dark-border-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.home-toggle:hover { transform: translateY(-1px); }
+.home-toggle:active { transform: translateY(0); }
 </style>
