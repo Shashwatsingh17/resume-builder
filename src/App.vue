@@ -473,6 +473,9 @@ export default {
     };
   },
   computed: {
+    layoutModeClass() {
+      return this.layoutMode === 'single-column' ? 'single-column' : 'two-column';
+    },
     cssVars() {
       const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
       const right = 100 - left;
