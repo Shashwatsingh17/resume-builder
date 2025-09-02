@@ -139,6 +139,17 @@ export default {
           },
           showImage: false,
           imageShape: 'round'
+        },
+        {
+          id: 'overleaf-cv-tex',
+          name: 'Overleaf LaTeX CV',
+          description: 'Monochrome, content-first LaTeX-inspired style',
+          colors: {
+            left: '#2a2a2a',
+            right: '#111111'
+          },
+          showImage: false,
+          imageShape: 'square'
         }
       ]
     };
