@@ -921,6 +921,9 @@ export default {
               try {
                 // Apply config
                 Object.assign(this, config);
+                if (config.currentTemplateId) {
+                  this.applyTemplate(config.currentTemplateId);
+                }
                 this.saveToLocalStorage();
                 
                 // Animate back
