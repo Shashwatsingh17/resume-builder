@@ -161,7 +161,7 @@
               id="resume"
               ref="resume"
               class="resume"
-              :class="[currentTemplateId, { 'edit-mode': editing }]"
+              :class="[currentTemplateId, layoutModeClass, { 'edit-mode': editing }]"
               :style="cssVars"
             >
               <div class="left-col" ref="leftCol">
