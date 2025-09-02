@@ -474,10 +474,16 @@ export default {
   },
   computed: {
     cssVars() {
+      const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
+      const right = 100 - left;
+      const zoom = Math.max(75, Math.min(140, Number(this.zoomPercent)));
       return {
         '--highlight-color-left': this.colors.left.highlight,
         '--highlight-color-right': this.colors.right.highlight,
-        '--headline-weight': this.editing ? '600' : '700'
+        '--headline-weight': this.editing ? '600' : '700',
+        '--left-col-width': left + '%',
+        '--right-col-width': right + '%',
+        '--resume-zoom-scale': (zoom / 100).toString()
       };
     },
     resumeData() {
