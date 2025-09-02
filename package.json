@@ -9,6 +9,9 @@
     },
     "dependencies": {
         "gsap": "^3.13.0",
+        "primeflex": "^4.0.0",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.3.8",
         "vue": "^3.3.4"
     },
     "devDependencies": {
