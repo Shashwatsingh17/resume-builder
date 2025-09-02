@@ -498,6 +498,9 @@ export default {
           return 'layout-default';
       }
     },
+    themeClass() {
+      return `theme-${this.currentThemeId}`;
+    },
     cssVars() {
       const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
       const right = 100 - left;
