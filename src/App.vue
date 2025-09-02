@@ -1144,6 +1144,54 @@ export default {
           this.layoutMode = 'single-column';
           this.leftColWidthPercent = 30;
           break;
+        case 'altacv':
+          this.colors.left.highlight = '#00bcd4';
+          this.colors.right.highlight = '#263238';
+          this.showImage = true;
+          this.imageShape = 'round';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 32;
+          break;
+        case 'twenty-seconds':
+          this.colors.left.highlight = '#7c3aed';
+          this.colors.right.highlight = '#312e81';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 28;
+          break;
+        case 'classicthesis':
+          this.colors.left.highlight = '#6b7280';
+          this.colors.right.highlight = '#374151';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        case 'timeline':
+          this.colors.left.highlight = '#059669';
+          this.colors.right.highlight = '#065f46';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 26;
+          break;
+        case 'material':
+          this.colors.left.highlight = '#009688';
+          this.colors.right.highlight = '#3f51b5';
+          this.showImage = true;
+          this.imageShape = 'square';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 38;
+          break;
+        case 'monochrome':
+          this.colors.left.highlight = '#111827';
+          this.colors.right.highlight = '#111827';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
         default:
           break;
       }
