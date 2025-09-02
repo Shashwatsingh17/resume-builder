@@ -1409,10 +1409,12 @@ export default {
 .resume {
   display: flex;
   min-height: 800px;
+  transform: scale(var(--resume-zoom-scale, 1));
+  transform-origin: top center;
 }
 
 .left-col {
-  width: 35%;
+  width: var(--left-col-width, 35%);
   background: linear-gradient(180deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%);
   color: var(--dark-text-primary);
   padding: 48px 36px;
@@ -1434,7 +1436,7 @@ export default {
 }
 
 .right-col {
-  width: 65%;
+  width: var(--right-col-width, 65%);
   padding: 48px 40px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   position: relative;
@@ -1550,6 +1552,15 @@ export default {
   .sidebar {
     width: 320px;
   }
+}
+
+.resume.single-column {
+  flex-direction: column;
+}
+
+.single-column .left-col,
+.single-column .right-col {
+  width: 100%;
 }
 
 @media (max-width: 768px) {
