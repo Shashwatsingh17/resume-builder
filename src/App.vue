@@ -530,7 +530,8 @@ export default {
         currentTemplateId: this.currentTemplateId,
         layoutMode: this.layoutMode,
         leftColWidthPercent: this.leftColWidthPercent,
-        zoomPercent: this.zoomPercent
+        zoomPercent: this.zoomPercent,
+        currentThemeId: this.currentThemeId
       };
     }
   },
