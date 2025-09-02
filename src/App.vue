@@ -502,7 +502,10 @@ export default {
         showImage: this.showImage,
         imageUrl: this.imageUrl,
         colors: this.colors,
-        currentTemplateId: this.currentTemplateId
+        currentTemplateId: this.currentTemplateId,
+        layoutMode: this.layoutMode,
+        leftColWidthPercent: this.leftColWidthPercent,
+        zoomPercent: this.zoomPercent
       };
     }
   },
