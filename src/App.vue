@@ -458,7 +458,8 @@ export default {
         education: this.education,
         showImage: this.showImage,
         imageUrl: this.imageUrl,
-        colors: this.colors
+        colors: this.colors,
+        currentTemplateId: this.currentTemplateId
       };
     }
   },
