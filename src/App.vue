@@ -21,7 +21,7 @@
     </div>
 
     <!-- Main Application -->
-    <div v-if="!isLoading" class="main-app" ref="mainApp">
+    <div v-if="!isLoading" class="main-app" :class="themeClass" ref="mainApp">
       <div class="container d-flex">
         <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed" :aria-pressed="sidebarCollapsed" aria-label="Toggle sidebar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
