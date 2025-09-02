@@ -357,7 +357,8 @@ export default {
     CustomButton,
     AIAnalysis,
     ResumeVariations,
-    TemplateSelector
+    TemplateSelector,
+    PercentageInput
   },
   data() {
     return {
