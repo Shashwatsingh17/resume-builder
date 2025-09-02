@@ -1026,7 +1026,10 @@ export default {
           imageUrl: this.imageUrl,
           resumeFormat: this.resumeFormat,
           headlines: this.headlines,
-          currentTemplateId: this.currentTemplateId
+          currentTemplateId: this.currentTemplateId,
+          layoutMode: this.layoutMode,
+          leftColWidthPercent: this.leftColWidthPercent,
+          zoomPercent: this.zoomPercent
         };
         localStorage.setItem('resumeData', JSON.stringify(data));
       } catch (error) {
