@@ -301,6 +301,11 @@ export default {
 .template-option:nth-child(2) { animation-delay: 0.2s; }
 .template-option:nth-child(3) { animation-delay: 0.3s; }
 .template-option:nth-child(4) { animation-delay: 0.4s; }
+.template-option:nth-child(5) { animation-delay: 0.5s; }
+.template-option:nth-child(6) { animation-delay: 0.6s; }
+.template-option:nth-child(7) { animation-delay: 0.7s; }
+.template-option:nth-child(8) { animation-delay: 0.8s; }
+.template-option:nth-child(9) { animation-delay: 0.9s; }
 
 @keyframes fadeInUp {
   to {
