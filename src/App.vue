@@ -106,6 +106,29 @@
               @template-changed="changeTemplate"
             />
 
+            <div class="layout-controls" ref="layoutControls">
+              <SelectInput
+                label="Layout"
+                :options="[{ name: 'Two Column', value: 'two-column' }, { name: 'Single Column', value: 'single-column' }]"
+                :default-option="layoutMode"
+                @update-selection="updateLayoutMode"
+              />
+              <PercentageInput
+                label="Left Column Width"
+                :min="20"
+                :max="60"
+                :current-value="leftColWidthPercent"
+                @percentage-changed="updateLeftWidth"
+              />
+              <PercentageInput
+                label="Zoom"
+                :min="75"
+                :max="140"
+                :current-value="zoomPercent"
+                @percentage-changed="updateZoom"
+              />
+            </div>
+
             <div class="color-controls" ref="colorControls">
               <ColorInput
                 label="Left Column Color"
