@@ -171,7 +171,7 @@ export default {
 
 .template-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
