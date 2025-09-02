@@ -476,7 +476,8 @@ export default {
       sidebarCollapsed: false,
       layoutMode: 'two-column',
       leftColWidthPercent: 35,
-      zoomPercent: 100
+      zoomPercent: 100,
+      currentThemeId: 'dark-neon'
     };
   },
   computed: {
