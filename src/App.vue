@@ -856,7 +856,8 @@ export default {
         imageShape: this.imageShape,
         imageUrl: this.imageUrl,
         resumeFormat: this.resumeFormat,
-        headlines: this.headlines
+        headlines: this.headlines,
+        currentTemplateId: this.currentTemplateId
       };
       
       const dataStr = JSON.stringify(config, null, 2);
