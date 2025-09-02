@@ -1302,6 +1302,11 @@ export default {
   align-items: flex-start;
   justify-content: center;
   opacity: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.resume-wrapper.expanded-canvas {
+  margin-left: 80px;
 }
 
 .resume-container {
