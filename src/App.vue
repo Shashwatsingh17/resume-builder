@@ -96,6 +96,11 @@
               />
             </div>
 
+            <TemplateSelector
+              :current-template="currentTemplateId"
+              @template-changed="changeTemplate"
+            />
+
             <div class="color-controls" ref="colorControls">
               <ColorInput
                 label="Left Column Color"
