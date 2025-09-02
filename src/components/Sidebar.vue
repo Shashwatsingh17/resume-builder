@@ -1,5 +1,5 @@
 <template>
-    <div class="sidebar" ref="sidebar">
+    <div class="sidebar" :class="{ collapsed }" ref="sidebar" aria-label="Sidebar" :aria-expanded="!collapsed">
         <div class="sidebar-backdrop"></div>
         <div class="sidebar-content">
         <slot></slot>
@@ -11,6 +11,12 @@
 import { gsap } from 'gsap';
 
 export default {
+  props: {
+    collapsed: {
+      type: Boolean,
+      default: false
+    }
+  },
   mounted() {
     try {
       this.initSidebarAnimations();
@@ -49,6 +55,11 @@ export default {
   height: 100%;
   z-index: 100;
   overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 80px;
 }
 
 .sidebar-backdrop {
@@ -69,7 +80,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
 }
@@ -80,6 +91,13 @@ export default {
   padding: 40px 28px;
   height: 100%;
   overflow-y: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-content {
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
 }
 
 .sidebar label {
@@ -119,9 +137,15 @@ export default {
 .sidebar-section:hover {
   border-color: rgba(99, 102, 241, 0.4);
   background: rgba(255, 255, 255, 0.05);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(99, 102, 241, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .sidebar.collapsed {
+    width: 0;
+  }
 }
 </style>

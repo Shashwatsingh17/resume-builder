@@ -21,9 +21,14 @@
     </div>
 
     <!-- Main Application -->
-    <div v-if="!isLoading" class="main-app" ref="mainApp">
+    <div v-if="!isLoading" class="main-app" :class="themeClass" ref="mainApp">
       <div class="container d-flex">
-        <Sidebar ref="sidebar">
+        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed" :aria-pressed="sidebarCollapsed" aria-label="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <Sidebar ref="sidebar" :collapsed="sidebarCollapsed">
           <div class="sidebar-header" ref="sidebarHeader">
             <h1 class="app-title">
               <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -96,6 +101,39 @@
               />
             </div>
 
+            <ThemeSelector
+              :current-theme="currentThemeId"
+              @theme-changed="changeTheme"
+            />
+
+            <TemplateSelector
+              :current-template="currentTemplateId"
+              @template-changed="changeTemplate"
+            />
+
+            <div class="layout-controls" ref="layoutControls">
+              <SelectInput
+                label="Layout"
+                :options="[{ name: 'Two Column', value: 'two-column' }, { name: 'Single Column', value: 'single-column' }]"
+                :default-option="layoutMode"
+                @update-selection="updateLayoutMode"
+              />
+              <PercentageInput
+                label="Left Column Width"
+                :min="20"
+                :max="60"
+                :current-value="leftColWidthPercent"
+                @percentage-changed="updateLeftWidth"
+              />
+              <PercentageInput
+                label="Zoom"
+                :min="75"
+                :max="140"
+                :current-value="zoomPercent"
+                @percentage-changed="updateZoom"
+              />
+            </div>
+
             <div class="color-controls" ref="colorControls">
               <ColorInput
                 label="Left Column Color"
@@ -122,13 +160,13 @@
         </Sidebar>
 
         <!-- Resume Content -->
-        <div class="resume-wrapper" ref="resumeWrapper">
+        <div class="resume-wrapper" :class="{ 'expanded-canvas': sidebarCollapsed }" ref="resumeWrapper">
           <div class="resume-container" ref="resumeContainer">
             <div
               id="resume"
               ref="resume"
               class="resume"
-              :class="{ 'edit-mode': editing }"
+              :class="[currentTemplateId, layoutModeClass, templateLayoutClass, { 'edit-mode': editing }]"
               :style="cssVars"
             >
               <div class="left-col" ref="leftCol">
@@ -297,12 +335,15 @@ import ResumeEntry from './components/ResumeEntry.vue';
 import EditButtons from './components/EditButtons.vue';
 import ToggleSwitch from './components/ToggleSwitch.vue';
 import SelectInput from './components/SelectInput.vue';
+import PercentageInput from './components/PercentageInput.vue';
 import ColorInput from './components/ColorInput.vue';
 import ImgUpload from './components/ImgUpload.vue';
 import ExportPdf from './components/ExportPdf.vue';
 import CustomButton from './components/CustomButton.vue';
 import AIAnalysis from './components/AIAnalysis.vue';
 import ResumeVariations from './components/ResumeVariations.vue';
+import TemplateSelector from './components/TemplateSelector.vue';
+import ThemeSelector from './components/ThemeSelector.vue';
 
 export default {
   name: 'App',
@@ -321,7 +362,10 @@ export default {
     ExportPdf,
     CustomButton,
     AIAnalysis,
-    ResumeVariations
+    ResumeVariations,
+    TemplateSelector,
+    PercentageInput,
+    ThemeSelector
   },
   data() {
     return {
@@ -428,15 +472,46 @@ export default {
         { name: 'Round', value: 'round' },
         { name: 'Square', value: 'square' }
       ],
-      currentTemplateId: 'modern-minimal' // Default template
+      currentTemplateId: 'modern-minimal',
+      sidebarCollapsed: false,
+      layoutMode: 'two-column',
+      leftColWidthPercent: 35,
+      zoomPercent: 100,
+      currentThemeId: 'dark-neon'
     };
   },
   computed: {
+    layoutModeClass() {
+      return this.layoutMode === 'single-column' ? 'single-column' : 'two-column';
+    },
+    templateLayoutClass() {
+      switch (this.currentTemplateId) {
+        case 'twenty-seconds':
+          return 'layout-header-band';
+        case 'material':
+          return 'layout-stacked';
+        case 'timeline':
+          return 'layout-timeline';
+        case 'overleaf-deedy':
+          return 'layout-sidebar-right';
+        default:
+          return 'layout-default';
+      }
+    },
+    themeClass() {
+      return `theme-${this.currentThemeId}`;
+    },
     cssVars() {
+      const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
+      const right = 100 - left;
+      const zoom = Math.max(75, Math.min(140, Number(this.zoomPercent)));
       return {
         '--highlight-color-left': this.colors.left.highlight,
         '--highlight-color-right': this.colors.right.highlight,
-        '--headline-weight': this.editing ? '600' : '700'
+        '--headline-weight': this.editing ? '600' : '700',
+        '--left-col-width': left + '%',
+        '--right-col-width': right + '%',
+        '--resume-zoom-scale': (zoom / 100).toString()
       };
     },
     resumeData() {
@@ -451,7 +526,12 @@ export default {
         education: this.education,
         showImage: this.showImage,
         imageUrl: this.imageUrl,
-        colors: this.colors
+        colors: this.colors,
+        currentTemplateId: this.currentTemplateId,
+        layoutMode: this.layoutMode,
+        leftColWidthPercent: this.leftColWidthPercent,
+        zoomPercent: this.zoomPercent,
+        currentThemeId: this.currentThemeId
       };
     }
   },
@@ -617,6 +697,22 @@ export default {
     },
     updateRightColor(color) {
       this.colors.right.highlight = color;
+      this.saveToLocalStorage();
+    },
+    updateLayoutMode(val) {
+      this.layoutMode = val;
+      this.saveToLocalStorage();
+    },
+    updateLeftWidth(val) {
+      this.leftColWidthPercent = Number(val);
+      this.saveToLocalStorage();
+    },
+    updateZoom(val) {
+      this.zoomPercent = Number(val);
+      this.saveToLocalStorage();
+    },
+    changeTheme(themeId) {
+      this.currentThemeId = themeId;
       this.saveToLocalStorage();
     },
     updateName(event) {
@@ -848,7 +944,12 @@ export default {
         imageShape: this.imageShape,
         imageUrl: this.imageUrl,
         resumeFormat: this.resumeFormat,
-        headlines: this.headlines
+        headlines: this.headlines,
+        currentTemplateId: this.currentTemplateId,
+        layoutMode: this.layoutMode,
+        leftColWidthPercent: this.leftColWidthPercent,
+        zoomPercent: this.zoomPercent,
+        currentThemeId: this.currentThemeId
       };
       
       const dataStr = JSON.stringify(config, null, 2);
@@ -912,6 +1013,12 @@ export default {
               try {
                 // Apply config
                 Object.assign(this, config);
+                if (config.currentTemplateId) {
+                  this.applyTemplate(config.currentTemplateId);
+                }
+                if (config.currentThemeId) {
+                  this.currentThemeId = config.currentThemeId;
+                }
                 this.saveToLocalStorage();
                 
                 // Animate back
@@ -955,7 +1062,12 @@ export default {
           imageShape: this.imageShape,
           imageUrl: this.imageUrl,
           resumeFormat: this.resumeFormat,
-          headlines: this.headlines
+          headlines: this.headlines,
+          currentTemplateId: this.currentTemplateId,
+          layoutMode: this.layoutMode,
+          leftColWidthPercent: this.leftColWidthPercent,
+          zoomPercent: this.zoomPercent,
+          currentThemeId: this.currentThemeId
         };
         localStorage.setItem('resumeData', JSON.stringify(data));
       } catch (error) {
@@ -982,6 +1094,12 @@ export default {
             // Validate the data structure before applying
             if (data && typeof data === 'object') {
               Object.assign(this, data);
+              if (data.currentTemplateId) {
+                this.applyTemplate(data.currentTemplateId);
+              }
+              if (data.currentThemeId) {
+                this.currentThemeId = data.currentThemeId;
+              }
             }
           } catch (error) {
             console.error('Error parsing saved data:', error);
@@ -1025,6 +1143,92 @@ export default {
           this.colors.left.highlight = '#95a5a6';
           this.colors.right.highlight = '#7f8c8d';
           this.showImage = false;
+          break;
+        case 'overleaf-awesome-cv':
+          this.colors.left.highlight = '#cc0000';
+          this.colors.right.highlight = '#2b2b2b';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-deedy':
+          this.colors.left.highlight = '#1f6feb';
+          this.colors.right.highlight = '#0d1117';
+          this.showImage = true;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-moderncv':
+          this.colors.left.highlight = '#2c3e50';
+          this.colors.right.highlight = '#18bc9c';
+          this.showImage = true;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-classic':
+          this.colors.left.highlight = '#555555';
+          this.colors.right.highlight = '#2c3e50';
+          this.showImage = false;
+          this.imageShape = 'square';
+          break;
+        case 'overleaf-compact':
+          this.colors.left.highlight = '#7e57c2';
+          this.colors.right.highlight = '#26a69a';
+          this.showImage = false;
+          this.imageShape = 'round';
+          break;
+        case 'overleaf-cv-tex':
+          this.colors.left.highlight = '#2a2a2a';
+          this.colors.right.highlight = '#111111';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        case 'altacv':
+          this.colors.left.highlight = '#00bcd4';
+          this.colors.right.highlight = '#263238';
+          this.showImage = true;
+          this.imageShape = 'round';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 32;
+          break;
+        case 'twenty-seconds':
+          this.colors.left.highlight = '#7c3aed';
+          this.colors.right.highlight = '#312e81';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 28;
+          break;
+        case 'classicthesis':
+          this.colors.left.highlight = '#6b7280';
+          this.colors.right.highlight = '#374151';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
+          break;
+        case 'timeline':
+          this.colors.left.highlight = '#059669';
+          this.colors.right.highlight = '#065f46';
+          this.showImage = false;
+          this.imageShape = 'round';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 26;
+          break;
+        case 'material':
+          this.colors.left.highlight = '#009688';
+          this.colors.right.highlight = '#3f51b5';
+          this.showImage = true;
+          this.imageShape = 'square';
+          this.layoutMode = 'two-column';
+          this.leftColWidthPercent = 38;
+          break;
+        case 'monochrome':
+          this.colors.left.highlight = '#111827';
+          this.colors.right.highlight = '#111827';
+          this.showImage = false;
+          this.imageShape = 'square';
+          this.layoutMode = 'single-column';
+          this.leftColWidthPercent = 30;
           break;
         default:
           break;
@@ -1128,6 +1332,32 @@ export default {
   position: relative;
 }
 
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--dark-text-primary);
+  background: var(--gradient-primary);
+  border: 1px solid var(--dark-border-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.sidebar-toggle:active {
+  transform: translateY(0);
+}
+
 /* Sidebar Header */
 .sidebar-header {
   text-align: center;
@@ -1224,6 +1454,11 @@ export default {
   align-items: flex-start;
   justify-content: center;
   opacity: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.resume-wrapper.expanded-canvas {
+  margin-left: 80px;
 }
 
 .resume-container {
@@ -1268,10 +1503,12 @@ export default {
 .resume {
   display: flex;
   min-height: 800px;
+  transform: scale(var(--resume-zoom-scale, 1));
+  transform-origin: top center;
 }
 
 .left-col {
-  width: 35%;
+  width: var(--left-col-width, 35%);
   background: linear-gradient(180deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%);
   color: var(--dark-text-primary);
   padding: 48px 36px;
@@ -1293,10 +1530,65 @@ export default {
 }
 
 .right-col {
-  width: 65%;
+  width: var(--right-col-width, 65%);
   padding: 48px 40px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   position: relative;
+}
+
+/* Sidebar on right */
+.resume.layout-sidebar-right .left-col { order: 2; }
+.resume.layout-sidebar-right .right-col { order: 1; }
+
+/* Header band: full-width header, sections stacked below */
+.resume.layout-header-band { flex-direction: column; }
+.resume.layout-header-band .header-section {
+  margin-bottom: 24px;
+  padding: 24px 32px;
+  background: var(--dark-accent-light);
+  border-bottom: 2px solid var(--highlight-color-right);
+  border-top: 2px solid var(--highlight-color-right);
+}
+.resume.layout-header-band .right-col,
+.resume.layout-header-band .left-col { width: 100%; }
+
+/* Stacked cards: sections in cards with gaps */
+.resume.layout-stacked { flex-direction: column; gap: 20px; }
+.resume.layout-stacked .left-col,
+.resume.layout-stacked .right-col {
+  width: 100%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Timeline: single column emphasis on experience */
+.resume.layout-timeline { flex-direction: column; }
+.resume.layout-timeline .right-col { width: 100%; }
+.resume.layout-timeline .left-col { width: 100%; order: 2; }
+.resume.layout-timeline .experience-list { position: relative; }
+.resume.layout-timeline .experience-list::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--highlight-color-right);
+  opacity: 0.4;
+}
+.resume.layout-timeline .experience-list .inner-section { padding-left: 36px; position: relative; }
+.resume.layout-timeline .experience-list .inner-section::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--highlight-color-right);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
 .right-col::before {
@@ -1409,6 +1701,15 @@ export default {
   .sidebar {
     width: 320px;
   }
+}
+
+.resume.single-column {
+  flex-direction: column;
+}
+
+.single-column .left-col,
+.single-column .right-col {
+  width: 100%;
 }
 
 @media (max-width: 768px) {
