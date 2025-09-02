@@ -476,6 +476,20 @@ export default {
     layoutModeClass() {
       return this.layoutMode === 'single-column' ? 'single-column' : 'two-column';
     },
+    templateLayoutClass() {
+      switch (this.currentTemplateId) {
+        case 'twenty-seconds':
+          return 'layout-header-band';
+        case 'material':
+          return 'layout-stacked';
+        case 'timeline':
+          return 'layout-timeline';
+        case 'overleaf-deedy':
+          return 'layout-sidebar-right';
+        default:
+          return 'layout-default';
+      }
+    },
     cssVars() {
       const left = Math.max(20, Math.min(60, Number(this.leftColWidthPercent)));
       const right = 100 - left;
