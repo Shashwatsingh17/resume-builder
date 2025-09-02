@@ -330,6 +330,7 @@ import ResumeEntry from './components/ResumeEntry.vue';
 import EditButtons from './components/EditButtons.vue';
 import ToggleSwitch from './components/ToggleSwitch.vue';
 import SelectInput from './components/SelectInput.vue';
+import PercentageInput from './components/PercentageInput.vue';
 import ColorInput from './components/ColorInput.vue';
 import ImgUpload from './components/ImgUpload.vue';
 import ExportPdf from './components/ExportPdf.vue';
