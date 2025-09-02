@@ -20,6 +20,11 @@
       </div>
     </div>
 
+    <!-- Home Page -->
+    <div v-if="!isLoading && showHome" class="home-app" :class="themeClass" ref="homeApp">
+      <HomePage @start="handleStart" />
+    </div>
+
     <!-- Main Application -->
     <div v-if="!isLoading" class="main-app" :class="themeClass" ref="mainApp">
       <div class="container d-flex">
