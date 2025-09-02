@@ -1180,6 +1180,32 @@ export default {
   position: relative;
 }
 
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--dark-text-primary);
+  background: var(--gradient-primary);
+  border: 1px solid var(--dark-border-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.sidebar-toggle:active {
+  transform: translateY(0);
+}
+
 /* Sidebar Header */
 .sidebar-header {
   text-align: center;
