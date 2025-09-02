@@ -3,8 +3,8 @@
         <select class="custom-input" @change="$emit('updateSelection', $event.target.value)">
             <option
                 v-for="option in options"
-                :value="option.value"
                 :key="option.value"
+                :value="option.value"
                 :selected="defaultOption == option.value">
                 {{ option.name }}
             </option>

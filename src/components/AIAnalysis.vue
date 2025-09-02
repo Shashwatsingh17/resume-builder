@@ -12,7 +12,7 @@
       <CustomButton 
         @click="analyzeResume" 
         ref="analyzeButton"
-        :class="{ 'btn-disabled': isAnalyzing }"
+        :disabled="isAnalyzing"
         btn-type="primary">
         {{ isAnalyzing ? 'Analyzing...' : 'Analyze Resume' }}
       </CustomButton>

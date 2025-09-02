@@ -3,6 +3,7 @@
     <div class="entry-title-row">
       <div
         class="resumeentry-title"
+        data-field="title"
         :contenteditable="editing"
         @blur="$emit('edit', $event, 'title')"
       >
@@ -13,12 +14,14 @@
     <div class="d-flex justify-content-between">
       <div class="resumeentry-location">
         <span
+          data-field="company"
           :contenteditable="editing"
           @blur="$emit('edit', $event, isEducation ? 'university' : 'company')"
         >
           {{ isEducation ? item.university : item.company }} </span
         >,
         <span
+          data-field="location"
           :contenteditable="editing"
           @blur="$emit('edit', $event, 'location')"
         >
@@ -27,6 +30,7 @@
       </div>
       <div
         class="resumeentry-date"
+        data-field="date"
         :contenteditable="editing"
         @blur="$emit('edit', $event, 'date')"
       >
@@ -37,6 +41,7 @@
       <li
         v-for="(desc, index) in item.description"
         :key="index"
+        :data-desc-index="index"
         :contenteditable="editing"
         @blur="$emit('editDesc', $event, index)"
       >

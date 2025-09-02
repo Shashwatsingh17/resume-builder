@@ -34,10 +34,9 @@
       <CustomButton 
         @click="generateVariation" 
         ref="generateButton"
-        :class="{ 'btn-disabled': !selectedVariationType }"
+        :disabled="!selectedVariationType || isGenerating"
         btn-type="primary"
-        :disabled="!selectedVariationType">
-        :disabled="isAnalyzing">
+        >
         Generate Variation
       </CustomButton>
     </div>

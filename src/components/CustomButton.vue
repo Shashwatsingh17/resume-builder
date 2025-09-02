@@ -3,6 +3,7 @@
         class="btn" 
         ref="button"
         :class="customClass"
+        :disabled="$attrs.disabled"
         @mouseenter="onHover"
         @mouseleave="onLeave"
     >
@@ -156,5 +157,8 @@ export default {
   cursor: not-allowed;
   pointer-events: none;
   transform: none !important;
+  background: var(--dark-bg-tertiary) !important;
+  color: var(--dark-text-muted) !important;
+  box-shadow: none !important;
 }
 </style>
